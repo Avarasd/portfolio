@@ -1,0 +1,1523 @@
+/* ============================================================
+   Tóth Avar — Portfolio
+   Palette: warm beige / off-white, near-black text, high contrast
+   Type: Newsreader (italic serif display) + Inter (sans body)
+   ============================================================ */
+
+/* Registered custom property so the accent hue can be smoothly
+   interpolated in a keyframe (plain --vars can't tween). */
+@property --accent-hue {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 338;
+}
+
+:root {
+  /* Color — soft blush / rose, inspired by a pale pink spell-circle.
+     Warm near-white base with a faint pink cast, rose-tinted neutrals. */
+  --bg: #FBF1F0;
+  /* pale blush white */
+  --bg-alt: #FEF8F7;
+  /* lifted near-white, faint pink */
+  --ink: #2A1E22;
+  /* deep plum-black, high contrast */
+  --ink-soft: #5A4248;
+  /* soft mauve-charcoal */
+  --muted: #A68B90;
+  /* dusty rose-grey for secondary text */
+  --line: #ECD8D6;
+  /* pale rose hairline */
+
+  /* Living accent: a vivid pink/magenta inspired by the pink->red->blue
+     gradient artwork. Base sits around hue 338 (hot pink/magenta) and
+     drifts between magenta, red and blush over minutes. */
+  --accent-hue: 338;
+  --accent-sat: 82%;
+  --accent-light: 60%;
+  --accent: hsl(var(--accent-hue) var(--accent-sat) var(--accent-light));
+
+  /* Secondary accents, echoing the artwork's full sweep:
+     --accent-2: the cool blue-violet from the bottom corner.
+     --accent-3: the warm red/coral from the right side.
+     Both derive from the drifting hue so they shift in sympathy with
+     the primary accent instead of looking pinned-on. */
+  --accent-2: hsl(calc(var(--accent-hue) - 110) 78% 62%);
+  /* blue-violet */
+  --accent-3: hsl(calc(var(--accent-hue) + 20) 85% 60%);
+  /* red / coral */
+  --accent-soft: hsl(var(--accent-hue) 70% 95%);
+  /* pale pink wash */
+
+  /* Type */
+  --serif: "Newsreader", Georgia, "Times New Roman", serif;
+  --sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  /* Layout */
+  --maxw: 1100px;
+  --gutter: clamp(1.25rem, 5vw, 4rem);
+
+  /* Motion */
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* How long the light <-> dark color crossfade takes */
+  --theme-fade: 0.6s;
+
+  color-scheme: light;
+
+  /* The slow hue drift that makes the whole accent palette feel alive. */
+  animation: accentDrift 48s ease-in-out infinite alternate;
+}
+
+/* ---------- Dark mode ----------
+   Palette drawn from the gothic artwork: blackened base, deep oxblood
+   reds, and bone/silver line work. High contrast preserved. */
+[data-theme="dark"] {
+  --bg: #0D0A0B;
+  /* near-black, faint warm tint */
+  --bg-alt: #16100F;
+  /* slightly lifted panel black */
+  --ink: #ECE4E2;
+  /* bone / silver-white text */
+  --ink-soft: #B9A9A6;
+  /* dimmed warm grey for secondary text */
+  --muted: #6E5B59;
+  /* muted mauve-grey */
+  --line: #3A2A2A;
+  /* dark oxblood hairline */
+
+  /* Deep oxblood crimson, also drifting but kept dark + rich. */
+  --accent-hue: 0;
+  --accent-sat: 53%;
+  --accent-light: 36%;
+
+  /* Dark-mode secondaries: a dusky steel-teal and an antique gold, both
+     muted to sit quietly against the near-black gothic palette. */
+  --accent-2: hsl(calc(var(--accent-hue) + 185) 24% 52%);
+  /* dusky teal */
+  --accent-3: hsl(calc(var(--accent-hue) + 36) 46% 52%);
+  /* antique gold */
+  --accent-soft: hsl(var(--accent-hue) 30% 14%);
+  /* dark tinted wash */
+
+  color-scheme: dark;
+}
+
+/* The hue sweeps gently in each theme's own neighbourhood, so it never
+   leaves the intended palette — just breathes within it. Light mode now
+   drifts through the rose range (blush -> rose -> coral). */
+@keyframes accentDrift {
+  0% {
+    --accent-hue: 330;
+  }
+
+  50% {
+    --accent-hue: 344;
+  }
+
+  100% {
+    --accent-hue: 356;
+  }
+}
+
+[data-theme="dark"] {
+  animation: accentDriftDark 60s ease-in-out infinite alternate;
+}
+
+@keyframes accentDriftDark {
+  0% {
+    --accent-hue: 356;
+  }
+
+  50% {
+    --accent-hue: 12;
+  }
+
+  100% {
+    --accent-hue: 350;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  :root,
+  [data-theme="dark"] {
+    animation: none;
+  }
+}
+
+/* ---------- Reset ---------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: clamp(1rem, 0.95rem + 0.3vw, 1.125rem);
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  position: relative;
+  transition: background-color var(--theme-fade) var(--ease),
+    color var(--theme-fade) var(--ease);
+}
+
+/* Smoothly crossfade every element's color-ish properties when the
+   theme flips. Kept to color/background/border so it never fights the
+   existing transform/opacity transitions on buttons, links, etc. */
+.theme-transition * {
+  transition: background-color var(--theme-fade) var(--ease),
+    color var(--theme-fade) var(--ease),
+    border-color var(--theme-fade) var(--ease),
+    fill var(--theme-fade) var(--ease),
+    stroke var(--theme-fade) var(--ease),
+    filter var(--theme-fade) var(--ease),
+    box-shadow var(--theme-fade) var(--ease) !important;
+}
+
+/* ---------- Ambient background layer ---------- */
+/* Palette-matched SVG mandala, barely visible, that fills the whole
+   viewport and rotates slowly. A warm gradient wash on top keeps the
+   beige from ever feeling flat. */
+.bg-field {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* Primary mandala: a stack of four concentric ring layers. Each ring
+   SVG shares the same canvas and center, so stacked and centered they
+   align into one mandala — but each rotates at its own speed. Inner
+   rings spin fast, outer rings slow, for differential rotation. */
+.mandala {
+  position: absolute;
+  /* Square box sized to the larger viewport axis so the mandala always
+     fills the screen while staying whole and centered. */
+  width: 125vmax;
+  height: 125vmax;
+  top: 50%;
+  left: 50%;
+  margin-top: -62.5vmax;
+  margin-left: -62.5vmax;
+  /* Overall opacity knocks the whole mandala back a bit, so the circles
+     and line work read fainter on top of each ring's own pulsing. */
+  opacity: 0.62;
+  transition: filter var(--theme-fade) var(--ease);
+}
+
+/* The mandala SVGs are drawn in a warm (terracotta/charcoal) palette.
+   A retint filter recolors the whole thing to match the theme, and the
+   hue-rotate inside it is ANIMATED so the mandala's colors slowly cycle
+   and drift from one tone to another over time. */
+[data-theme="light"] .mandala {
+  filter: sepia(0.5) saturate(3.4) hue-rotate(300deg) brightness(1.03);
+  animation: mandalaHueLight 54s linear infinite;
+}
+
+[data-theme="dark"] .mandala {
+  filter: invert(1) sepia(0.5) saturate(2.4) hue-rotate(300deg) brightness(0.95);
+  animation: mandalaHueDark 64s linear infinite;
+}
+
+/* The accent mandala keeps its slow counter-rotation AND gets the hue
+   cycle — two animations run together (one drives transform, the other
+   filter), so they don't conflict. */
+[data-theme="light"] .bg-accent {
+  filter: sepia(0.5) saturate(3.4) hue-rotate(300deg) brightness(1.03);
+  animation: bgDriftReverse 140s linear infinite,
+    mandalaHueLight 54s linear infinite;
+}
+
+[data-theme="dark"] .bg-accent {
+  filter: invert(1) sepia(0.5) saturate(2.4) hue-rotate(300deg) brightness(0.95);
+  animation: bgDriftReverse 140s linear infinite,
+    mandalaHueDark 64s linear infinite;
+}
+
+/* Sweep the hue-rotate through a full turn so every gradient and stroke
+   in the mandala gradually shifts around the color wheel, then loops.
+   The base retint (sepia/saturate/brightness) is kept constant. */
+@keyframes mandalaHueLight {
+  from {
+    filter: sepia(0.5) saturate(3.4) hue-rotate(260deg) brightness(1.03);
+  }
+
+  to {
+    filter: sepia(0.5) saturate(3.4) hue-rotate(620deg) brightness(1.03);
+  }
+}
+
+@keyframes mandalaHueDark {
+  from {
+    filter: invert(1) sepia(0.5) saturate(2.4) hue-rotate(260deg) brightness(0.95);
+  }
+
+  to {
+    filter: invert(1) sepia(0.5) saturate(2.4) hue-rotate(620deg) brightness(0.95);
+  }
+}
+
+.bg-accent {
+  transition: filter var(--theme-fade) var(--ease),
+    opacity var(--theme-fade) var(--ease);
+}
+
+/* Each ring both spins (rotation) and pulses (opacity). The two
+   animations run on different, non-harmonic durations so a ring is
+   almost never at the same phase twice, and the four rings are offset
+   from each other — together that reads as irregular "waves" of
+   transparency washing through the mandala rather than a unified fade.
+   Baseline opacity also steps down outward, so the rim stays fainter. */
+.ring {
+  position: absolute;
+  inset: 0;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  transform-origin: center center;
+  animation-timing-function: linear, ease-in-out;
+  animation-iteration-count: infinite, infinite;
+  animation-direction: normal, alternate;
+  will-change: transform, opacity;
+}
+
+/* Inner -> fast spin, outer -> slow spin.
+   Opacity: inner brighter, outer fainter; each ring pulses on its own
+   cycle with a unique delay so the peaks never line up. */
+.ring-1 {
+  background-image: url("../assets/mandala-l1.svg");
+  animation-name: spin, pulse1;
+  animation-duration: 55s, 11s;
+  animation-delay: 0s, 0s;
+}
+
+.ring-2 {
+  background-image: url("../assets/mandala-l2.svg");
+  animation-name: spin, pulse2;
+  animation-duration: 95s, 15s;
+  animation-delay: 0s, -4s;
+}
+
+/* Ring of decorative CJK glyphs (spell-circle style). Rotates a touch
+   slower than ring-2. Uses its own fainter pulse so the kanji stay more
+   transparent than the rest of the line work. */
+.ring-glyphs {
+  background-image: url("../assets/mandala-glyphs.svg");
+  animation-name: spin, pulseGlyphs;
+  animation-duration: 120s, 17s;
+  animation-delay: 0s, -6s;
+}
+
+.ring-3 {
+  background-image: url("../assets/mandala-l3.svg");
+  animation-name: spin, pulse3;
+  animation-duration: 150s, 19s;
+  animation-delay: 0s, -9s;
+}
+
+.ring-4 {
+  background-image: url("../assets/mandala-l4.svg");
+  animation-name: spin, pulse4;
+  animation-duration: 230s, 23s;
+  animation-delay: 0s, -2s;
+}
+
+/* Secondary abstract mandala — fainter, larger, counter-rotating so the
+   two layers never settle into a fixed overlap. Sits above the primary
+   mandala but below the gradient wash and all content. */
+.bg-accent {
+  position: absolute;
+  width: 150vmax;
+  height: 150vmax;
+  top: 50%;
+  left: 50%;
+  margin-top: -75vmax;
+  margin-left: -75vmax;
+  background-image: url("../assets/bg-accent.svg");
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0.035;
+  transform-origin: center center;
+  animation: bgDriftReverse 140s linear infinite;
+}
+
+.bg-field::after {
+  /* Warm radial glow to add depth to the beige */
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(60% 50% at 72% 8%, color-mix(in srgb, var(--accent) 10%, transparent), transparent 70%),
+    radial-gradient(50% 40% at 10% 90%, color-mix(in srgb, var(--ink) 6%, transparent), transparent 70%);
+}
+
+/* Even rotation; speed is set per-ring via animation-duration. */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Opacity "waves". Each ring gets its own range and irregular stops so
+   the pulsing never feels mechanical, and ranges drop outward (ring-1
+   brightest, ring-4 faintest). Runs with animation-direction: alternate,
+   so these only need to describe the 0% -> 100% half of each cycle. */
+@keyframes pulse1 {
+  0% {
+    opacity: 0.085;
+  }
+
+  35% {
+    opacity: 0.13;
+  }
+
+  70% {
+    opacity: 0.06;
+  }
+
+  100% {
+    opacity: 0.11;
+  }
+}
+
+@keyframes pulse2 {
+  0% {
+    opacity: 0.07;
+  }
+
+  40% {
+    opacity: 0.11;
+  }
+
+  65% {
+    opacity: 0.045;
+  }
+
+  100% {
+    opacity: 0.09;
+  }
+}
+
+/* Fainter pulse for the kanji ring — kept noticeably more transparent
+   than the surrounding line work. */
+@keyframes pulseGlyphs {
+  0% {
+    opacity: 0.03;
+  }
+
+  45% {
+    opacity: 0.055;
+  }
+
+  70% {
+    opacity: 0.022;
+  }
+
+  100% {
+    opacity: 0.045;
+  }
+}
+
+@keyframes pulse3 {
+  0% {
+    opacity: 0.05;
+  }
+
+  30% {
+    opacity: 0.085;
+  }
+
+  75% {
+    opacity: 0.035;
+  }
+
+  100% {
+    opacity: 0.07;
+  }
+}
+
+@keyframes pulse4 {
+  0% {
+    opacity: 0.035;
+  }
+
+  45% {
+    opacity: 0.065;
+  }
+
+  60% {
+    opacity: 0.025;
+  }
+
+  100% {
+    opacity: 0.05;
+  }
+}
+
+@keyframes bgDriftReverse {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(-360deg);
+  }
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  font-weight: 500;
+  line-height: 1.05;
+}
+
+p {
+  margin: 0 0 1rem;
+}
+
+ul,
+ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+em {
+  font-style: italic;
+}
+
+.italic {
+  font-family: var(--serif);
+  font-style: italic;
+}
+
+/* ---------- Layout helpers ---------- */
+.wrap {
+  width: 100%;
+  max-width: var(--maxw);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.skip-link {
+  position: absolute;
+  left: -999px;
+  top: 0;
+  background: var(--ink);
+  color: var(--bg);
+  padding: 0.6rem 1rem;
+  z-index: 100;
+}
+
+.skip-link:focus {
+  left: 1rem;
+  top: 1rem;
+}
+
+/* ---------- Header ---------- */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: color-mix(in srgb, var(--bg) 85%, transparent);
+  backdrop-filter: saturate(140%) blur(8px);
+  border-bottom: 1px solid var(--line);
+}
+
+.header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 68px;
+}
+
+.brand {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 1.25rem;
+  letter-spacing: 0.01em;
+}
+
+.nav {
+  display: flex;
+  gap: clamp(1rem, 2.5vw, 2.25rem);
+  font-size: 0.9rem;
+}
+
+.nav a {
+  color: var(--ink-soft);
+  position: relative;
+  padding: 0.25rem 0;
+  transition: color 0.25s var(--ease);
+}
+
+.nav a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 100%;
+  height: 1px;
+  background: var(--ink);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s var(--ease);
+}
+
+.nav a:hover {
+  color: var(--ink);
+}
+
+.nav a:hover::after {
+  transform: scaleX(1);
+}
+
+@media (max-width: 620px) {
+  .nav {
+    display: none;
+  }
+}
+
+/* ---------- Theme toggle (sliding switch) ---------- */
+.theme-toggle {
+  --tt-w: 60px;
+  --tt-h: 30px;
+  --tt-pad: 3px;
+  --tt-thumb: calc(var(--tt-h) - var(--tt-pad) * 2);
+  margin-left: clamp(1rem, 2.5vw, 2rem);
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  line-height: 0;
+  border-radius: 999px;
+}
+
+.theme-toggle:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.theme-toggle-track {
+  position: relative;
+  display: inline-block;
+  width: var(--tt-w);
+  height: var(--tt-h);
+  background: var(--bg-alt);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  transition: background-color var(--theme-fade) var(--ease),
+    border-color var(--theme-fade) var(--ease);
+}
+
+/* The sliding thumb */
+.theme-toggle-thumb {
+  position: absolute;
+  top: var(--tt-pad);
+  left: var(--tt-pad);
+  width: var(--tt-thumb);
+  height: var(--tt-thumb);
+  border-radius: 50%;
+  background: var(--ink);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  transition: transform 0.4s var(--ease), background-color var(--theme-fade) var(--ease);
+}
+
+[data-theme="dark"] .theme-toggle-thumb {
+  transform: translateX(calc(var(--tt-w) - var(--tt-thumb) - var(--tt-pad) * 2));
+}
+
+/* Sun / moon icons sit at each end; the inactive one fades out */
+.theme-toggle-icon {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  display: inline-flex;
+  color: var(--ink-soft);
+  transition: opacity 0.4s var(--ease), color var(--theme-fade) var(--ease);
+}
+
+.theme-toggle-sun {
+  left: 7px;
+  opacity: 1;
+}
+
+.theme-toggle-moon {
+  right: 7px;
+  opacity: 0.35;
+}
+
+[data-theme="dark"] .theme-toggle-sun {
+  opacity: 0.35;
+}
+
+[data-theme="dark"] .theme-toggle-moon {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-toggle-thumb {
+    transition: transform 0.001s;
+  }
+}
+
+/* ---------- Hero ---------- */
+.hero {
+  padding-top: clamp(4rem, 12vh, 9rem);
+  padding-bottom: clamp(3rem, 10vh, 7rem);
+}
+
+.eyebrow {
+  font-size: 0.8rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--accent-2);
+  margin-bottom: 1.5rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  transition: color var(--theme-fade) var(--ease);
+}
+
+/* A small accent tick before the eyebrow label for a crafted detail.
+   Uses an explicit accent color (not currentColor) because the eyebrow
+   text itself is now gradient-clipped and its color is transparent. */
+.eyebrow::before {
+  content: "";
+  width: 1.6rem;
+  height: 1px;
+  background: var(--accent-2);
+  opacity: 0.7;
+}
+
+.hero-title {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: clamp(3.5rem, 14vw, 10rem);
+  line-height: 0.9;
+  letter-spacing: -0.02em;
+  margin-bottom: 2rem;
+}
+
+.hero-title .line {
+  display: block;
+}
+
+.hero-title .italic {
+  font-style: italic;
+  /* Your first name "Avar": a clear two-tone wash — the normal ink
+     easing into the full accent across the word, so the gradient is
+     plainly visible. Padding so serif ascenders aren't clipped. */
+  background: linear-gradient(102deg,
+      var(--ink) 8%,
+      var(--accent) 85%);
+  background-size: 140% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  padding-top: 0.08em;
+  /* Run BOTH the intro rise (once) and the sheen (looping). Without the
+     heroRise here, this rule would override the .line rule's animation
+     and leave the span stuck at opacity: 0 — i.e. invisible. The sheen
+     is delayed until the rise finishes. */
+  animation: heroRise 1s var(--ease) 0.45s forwards,
+    nameSheen 11s ease-in-out 1.4s infinite alternate;
+}
+
+@keyframes nameSheen {
+  from {
+    background-position: 0% 50%;
+  }
+
+  to {
+    background-position: 100% 50%;
+  }
+}
+
+/* ---------- Reusable subtle gradient text ----------
+   A gentle, palette-matched gradient for key text (top bar, eyebrow,
+   first name, section headers). Not neon — it only drifts between the
+   normal text ink and a soft accent, so it reads as a tasteful tint
+   that slowly shifts. Light mode leans pink; dark mode mixes a muted
+   green and rose for a cooler cast. */
+.gradient-text {
+  /* A clean two-tone blend: the normal ink easing into a clearly
+     visible accent. One smooth transition (not a rainbow), so it reads
+     as an intentional tint rather than a cheap multi-color gradient. */
+  background-image: linear-gradient(100deg,
+      var(--grad-a) 10%,
+      var(--grad-b) 88%);
+  /* Only mildly oversized, so the two-tone stays clearly visible across
+     the whole word at every point of the drift (no flat moment). */
+  background-size: 130% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  /* Padding so tall serif ascenders (top of a "T", accents like ó)
+     aren't clipped by the text background box. */
+  padding-top: 0.08em;
+  animation: gradientShift 16s ease-in-out infinite alternate;
+}
+
+/* Light mode: ink easing into a visible rose accent. */
+:root {
+  --grad-a: var(--ink);
+  --grad-b: var(--accent);
+}
+
+/* Dark mode: bone easing into a rich darkish pink-red (crimson-rose),
+   matching the warm red palette rather than a clashing green. */
+[data-theme="dark"] {
+  --grad-a: var(--ink);
+  --grad-b: hsl(344 62% 56%);
+}
+
+@keyframes gradientShift {
+  from {
+    background-position: 0% 50%;
+  }
+
+  to {
+    background-position: 100% 50%;
+  }
+}
+
+.hero-lead {
+  max-width: 40ch;
+  font-size: clamp(1.1rem, 1rem + 0.6vw, 1.4rem);
+  color: var(--ink-soft);
+  margin-bottom: 2.25rem;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+/* ---------- Buttons ---------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.75rem 1.5rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  background: var(--ink);
+  color: var(--bg-alt);
+  border: 1px solid var(--ink);
+  border-radius: 2px;
+  transition: background 0.25s var(--ease), color 0.25s var(--ease), transform 0.2s var(--ease);
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--ink);
+}
+
+.btn-ghost:hover {
+  background: var(--ink);
+  color: var(--bg-alt);
+}
+
+/* ---------- Sections ---------- */
+.section {
+  padding-block: clamp(3.5rem, 9vh, 6.5rem);
+  border-top: 1px solid var(--line);
+}
+
+.section-head {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  margin-bottom: clamp(2rem, 5vh, 3.5rem);
+}
+
+/* Each section carries one accent that both its number and its header
+   gradient use, so a header always ends in the same color as the number
+   beside it. The accent cycles as you scroll down the page. */
+.section {
+  --sec-accent: var(--accent);
+}
+
+.section:nth-of-type(3n + 2) {
+  --sec-accent: var(--accent-2);
+}
+
+.section:nth-of-type(3n + 3) {
+  --sec-accent: var(--accent-3);
+}
+
+.section-no {
+  font-size: 0.85rem;
+  letter-spacing: 0.1em;
+  color: var(--sec-accent);
+  font-variant-numeric: tabular-nums;
+  transition: color var(--theme-fade) var(--ease);
+}
+
+.section-title {
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(2rem, 1.5rem + 2.5vw, 3.25rem);
+  letter-spacing: -0.01em;
+}
+
+/* Section headers: a clean, visible two-tone — the normal ink easing
+   into this section's own accent (the same color as the number beside
+   it). Static (no drift) so large display type stays refined. */
+.section-title.gradient-text {
+  background-image: linear-gradient(100deg,
+      var(--grad-a) 15%,
+      var(--sec-accent) 92%);
+  background-size: 100% 100%;
+  animation: none;
+}
+
+/* ---------- About ---------- */
+.about-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(1.5rem, 5vw, 4rem);
+  align-items: start;
+}
+
+.about-lead {
+  font-family: var(--serif);
+  font-size: clamp(1.4rem, 1.1rem + 1.4vw, 2.1rem);
+  line-height: 1.3;
+  color: var(--ink);
+}
+
+.about-body {
+  color: var(--ink-soft);
+}
+
+@media (max-width: 760px) {
+  .about-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---------- Projects ---------- */
+.projects {
+  display: grid;
+  gap: 0;
+}
+
+.project {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: clamp(1rem, 4vw, 3rem);
+  padding: clamp(1.5rem, 3.5vh, 2.4rem) clamp(1.1rem, 2.5vw, 2rem);
+  /* squircle: large smooth radius */
+  border-radius: 26px;
+  background: transparent;
+  box-shadow: 0 0 0 1px transparent;
+  overflow: hidden;
+  isolation: isolate;
+  transition: background-color 0.45s var(--ease), box-shadow 0.45s var(--ease),
+    transform 0.45s var(--ease);
+}
+
+/* Thin divider between cards, drawn as a line that fades on hover so the
+   list still reads as a rhythm but the hovered item becomes its own card. */
+.project::after {
+  content: "";
+  position: absolute;
+  left: clamp(1.1rem, 2.5vw, 2rem);
+  right: clamp(1.1rem, 2.5vw, 2rem);
+  top: 0;
+  height: 1px;
+  background: var(--line);
+  transition: opacity 0.4s var(--ease);
+}
+
+.project:first-child::after {
+  opacity: 0;
+}
+
+.project:hover {
+  background-color: color-mix(in srgb, var(--bg-alt) 55%, transparent);
+  box-shadow: 0 10px 30px -12px color-mix(in srgb, var(--ink) 28%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--accent) 22%, transparent);
+  transform: translateY(-2px);
+}
+
+.project:hover::after,
+.project:hover+.project::after {
+  opacity: 0;
+}
+
+/* ---- Floating bubbles (only animate while hovered) ---- */
+.project-bubbles {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+  border-radius: inherit;
+}
+
+.bubble {
+  position: absolute;
+  bottom: -40px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%,
+      color-mix(in srgb, var(--accent) 55%, transparent),
+      color-mix(in srgb, var(--accent) 12%, transparent) 70%,
+      transparent 72%);
+  will-change: transform, opacity;
+  /* Idle state: parked at the bottom, fully invisible. No animation runs
+     until the card gains .is-hovering, so every bubble always begins its
+     float fresh from 0% (bottom, scale 0, opacity 0) on hover. */
+  opacity: 0;
+  animation-name: bubbleFloat;
+  animation-timing-function: ease-in;
+  animation-iteration-count: infinite;
+  animation-play-state: paused;
+}
+
+/* .is-hovering is toggled by JS on mouseenter/leave. Using a class (not
+   :hover) lets us re-trigger the animation from the start each time. */
+.project.is-hovering .bubble {
+  animation-play-state: running;
+}
+
+.bubble:nth-child(1) {
+  left: 8%;
+  width: 26px;
+  height: 26px;
+  animation-duration: 7s;
+  animation-delay: 0s;
+}
+
+.bubble:nth-child(2) {
+  left: 22%;
+  width: 14px;
+  height: 14px;
+  animation-duration: 5.5s;
+  animation-delay: 0.8s;
+}
+
+.bubble:nth-child(3) {
+  left: 38%;
+  width: 34px;
+  height: 34px;
+  animation-duration: 9s;
+  animation-delay: 0.3s;
+}
+
+.bubble:nth-child(4) {
+  left: 55%;
+  width: 18px;
+  height: 18px;
+  animation-duration: 6.5s;
+  animation-delay: 1.4s;
+}
+
+.bubble:nth-child(5) {
+  left: 70%;
+  width: 24px;
+  height: 24px;
+  animation-duration: 8s;
+  animation-delay: 0.5s;
+}
+
+.bubble:nth-child(6) {
+  left: 84%;
+  width: 12px;
+  height: 12px;
+  animation-duration: 5s;
+  animation-delay: 1.1s;
+}
+
+.bubble:nth-child(7) {
+  left: 93%;
+  width: 20px;
+  height: 20px;
+  animation-duration: 7.5s;
+  animation-delay: 0.2s;
+}
+
+/* Slight per-bubble hue offsets so they shimmer as a cluster of related
+   tones rather than identical dots — layered on top of the global drift. */
+.bubble:nth-child(2) {
+  filter: hue-rotate(14deg);
+}
+
+.bubble:nth-child(3) {
+  filter: hue-rotate(-10deg);
+}
+
+.bubble:nth-child(5) {
+  filter: hue-rotate(22deg);
+}
+
+.bubble:nth-child(6) {
+  filter: hue-rotate(-18deg);
+}
+
+@keyframes bubbleFloat {
+  0% {
+    transform: translateY(0) translateX(0) scale(0.6);
+    opacity: 0;
+  }
+
+  12% {
+    opacity: 0.8;
+  }
+
+  50% {
+    transform: translateY(-120px) translateX(14px) scale(1);
+  }
+
+  80% {
+    opacity: 0.5;
+  }
+
+  100% {
+    transform: translateY(-240px) translateX(-10px) scale(0.9);
+    opacity: 0;
+  }
+}
+
+.project-index {
+  font-size: 0.85rem;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  padding-top: 0.4rem;
+}
+
+.project-title {
+  font-size: clamp(1.6rem, 1.2rem + 1.8vw, 2.6rem);
+  font-weight: 400;
+  margin-bottom: 0.5rem;
+}
+
+.project-meta {
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 1rem;
+}
+
+.project-desc {
+  max-width: 60ch;
+  color: var(--ink-soft);
+}
+
+.project-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 1.25rem 0;
+}
+
+.project-tags li {
+  font-size: 0.78rem;
+  letter-spacing: 0.03em;
+  padding: 0.25rem 0.7rem;
+  border: 1px solid var(--line);
+  border-radius: 100px;
+  color: var(--ink-soft);
+}
+
+.project-links {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.project-links a {
+  font-size: 0.9rem;
+  font-weight: 500;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.25s var(--ease), color 0.25s var(--ease);
+}
+
+.project-links a:hover {
+  border-color: var(--accent-3);
+  color: var(--accent-3);
+}
+
+@media (max-width: 560px) {
+  .project {
+    grid-template-columns: 1fr;
+  }
+
+  .project-index {
+    display: none;
+  }
+}
+
+/* ---------- Toolkit ---------- */
+.toolkit {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(1.5rem, 5vw, 3.5rem);
+}
+
+.toolkit-label {
+  font-size: 0.78rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.toolkit-col ul {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.toolkit-col li {
+  color: var(--ink-soft);
+}
+
+.muted {
+  color: var(--muted);
+  font-size: 0.85em;
+}
+
+@media (max-width: 680px) {
+  .toolkit {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---------- Timeline ---------- */
+.timeline {
+  display: grid;
+  gap: 0;
+}
+
+.timeline-item {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  gap: clamp(1rem, 4vw, 3rem);
+  padding-block: 1.75rem;
+  border-top: 1px solid var(--line);
+}
+
+.timeline-item:last-child {
+  border-bottom: 1px solid var(--line);
+}
+
+.timeline-when {
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.timeline-what h3 {
+  font-size: 1.25rem;
+  margin-bottom: 0.25rem;
+}
+
+@media (max-width: 560px) {
+  .timeline-item {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+}
+
+/* ---------- Contact ---------- */
+.contact-lead {
+  font-family: var(--serif);
+  font-size: clamp(1.6rem, 1.2rem + 2vw, 2.75rem);
+  line-height: 1.25;
+  max-width: 24ch;
+  margin-bottom: 2rem;
+}
+
+.contact-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(1rem, 4vw, 2.5rem);
+  font-size: 1.05rem;
+}
+
+.contact-links a {
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 2px;
+  transition: border-color 0.25s var(--ease), color 0.25s var(--ease);
+}
+
+.contact-links a:hover {
+  border-color: var(--accent-2);
+  color: var(--accent-2);
+}
+
+/* ---------- Footer ---------- */
+.site-footer {
+  border-top: 1px solid var(--line);
+  padding-block: 2rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.footer-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.footer-inner a:hover {
+  color: var(--ink);
+}
+
+/* ---------- Scroll reveal ---------- */
+.reveal {
+  opacity: 0;
+  transform: translateY(22px);
+  filter: blur(6px);
+  transition: opacity 0.8s var(--ease), transform 0.8s var(--ease),
+    filter 0.8s var(--ease);
+  will-change: opacity, transform, filter;
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+  filter: blur(0);
+}
+
+/* Directional reveal variants for more editorial rhythm */
+.reveal-left {
+  transform: translateX(-28px);
+}
+
+.reveal-right {
+  transform: translateX(28px);
+}
+
+.reveal-scale {
+  transform: scale(0.96);
+  filter: blur(4px);
+}
+
+.reveal-left.is-visible,
+.reveal-right.is-visible,
+.reveal-scale.is-visible {
+  transform: none;
+}
+
+/* ---------- Hero intro sequence ---------- */
+/* Each hero element rises in on load, staggered. */
+.hero .eyebrow,
+.hero-title .line,
+.hero-lead,
+.hero-actions {
+  opacity: 0;
+  transform: translateY(26px);
+  animation: heroRise 1s var(--ease) forwards;
+}
+
+.hero .eyebrow {
+  animation-delay: 0.15s;
+}
+
+.hero-title .line:nth-child(1) {
+  animation-delay: 0.3s;
+}
+
+.hero-title .line:nth-child(2) {
+  animation-delay: 0.45s;
+}
+
+.hero-lead {
+  animation-delay: 0.6s;
+}
+
+.hero-actions {
+  animation-delay: 0.75s;
+}
+
+@keyframes heroRise {
+  from {
+    opacity: 0;
+    transform: translateY(26px);
+    filter: blur(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+    filter: blur(0);
+  }
+}
+
+/* ---------- Micro-interactions ---------- */
+/* Project rows nudge their title sideways on hover */
+.project .project-title {
+  transition: transform 0.4s var(--ease), color 0.4s var(--ease);
+}
+
+.project:hover .project-title {
+  transform: translateX(8px);
+}
+
+.project-tags li {
+  transition: border-color 0.3s var(--ease), color 0.3s var(--ease);
+}
+
+.project:hover .project-tags li {
+  border-color: var(--muted);
+}
+
+/* Buttons: subtle terracotta fill-sweep */
+.btn {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.45s var(--ease);
+  z-index: -1;
+}
+
+.btn:hover::before {
+  transform: scaleX(1);
+}
+
+.btn-ghost::before {
+  background: var(--ink);
+}
+
+/* Brand mark subtle shift on hover */
+.brand {
+  transition: letter-spacing 0.4s var(--ease);
+}
+
+.brand:hover {
+  letter-spacing: 0.04em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .reveal,
+  .reveal-left,
+  .reveal-right,
+  .reveal-scale {
+    opacity: 1;
+    transform: none;
+    filter: none;
+    transition: none;
+  }
+
+  .hero .eyebrow,
+  .hero-title .line,
+  .hero-lead,
+  .hero-actions {
+    opacity: 1;
+    transform: none;
+    animation: none;
+  }
+
+  /* Stop the name sheen and restore a solid, fully-visible color. */
+  .hero-title .italic {
+    animation: none;
+    background: none;
+    -webkit-background-clip: border-box;
+    background-clip: border-box;
+    color: var(--ink-soft);
+  }
+
+  /* Stop the gradient drift and restore a solid, fully-visible color on
+     all gradient-clipped text. !important beats the themed animation
+     rules that have higher specificity. */
+  .gradient-text {
+    animation: none !important;
+    background: none;
+    -webkit-background-clip: border-box;
+    background-clip: border-box;
+    color: var(--ink);
+  }
+
+  .ring,
+  .bg-accent,
+  .mandala {
+    /* !important so this beats the themed [data-theme] .mandala rules
+       that also set an animation (higher selector specificity). */
+    animation: none !important;
+  }
+
+  /* No pulse animation to supply opacity, so set sensible static values
+     (still stepping down outward) for the reduced-motion case. */
+  .ring-1 {
+    opacity: 0.1;
+  }
+
+  .ring-2 {
+    opacity: 0.08;
+  }
+
+  .ring-glyphs {
+    opacity: 0.04;
+  }
+
+  .ring-3 {
+    opacity: 0.06;
+  }
+
+  .ring-4 {
+    opacity: 0.045;
+  }
+
+  .btn:hover {
+    transform: none;
+  }
+
+  .project:hover .project-title {
+    transform: none;
+  }
+
+  .project:hover {
+    transform: none;
+  }
+
+  .bubble {
+    animation: none;
+    display: none;
+  }
+}

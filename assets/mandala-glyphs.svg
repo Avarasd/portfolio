@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1600" viewBox="0 0 1600 1600" fill="none">
+  <!-- ring of decorative CJK glyphs (spell-circle style) -->
+  <!-- Note: glyphs are purely ornamental line-art. -->
+  <g stroke="#1A1A1A" stroke-width="1.3" fill="none" stroke-opacity="0.9">
+    <circle cx="800.0" cy="800.0" r="373" />
+    <circle cx="800.0" cy="800.0" r="457" />
+  </g>
+  <g fill="#1A1A1A" font-family="'Noto Sans JP', 'Yu Gothic', 'Hiragino Sans', 'MS Gothic', sans-serif" font-size="46" text-anchor="middle">
+    <text x="800.00" y="385.00" dominant-baseline="central" transform="rotate(0.00 800.00 385.00)">天</text>
+    <text x="922.32" y="403.44" dominant-baseline="central" transform="rotate(17.14 922.32 403.44)">地</text>
+    <text x="1033.78" y="457.11" dominant-baseline="central" transform="rotate(34.29 1033.78 457.11)">水</text>
+    <text x="1124.46" y="541.25" dominant-baseline="central" transform="rotate(51.43 1124.46 541.25)">火</text>
+    <text x="1186.31" y="648.38" dominant-baseline="central" transform="rotate(68.57 1186.31 648.38)">風</text>
+    <text x="1213.84" y="768.99" dominant-baseline="central" transform="rotate(85.71 1213.84 768.99)">空</text>
+    <text x="1204.60" y="892.35" dominant-baseline="central" transform="rotate(102.86 1204.60 892.35)">心</text>
+    <text x="1159.40" y="1007.50" dominant-baseline="central" transform="rotate(120.00 1159.40 1007.50)">無</text>
+    <text x="1082.27" y="1104.22" dominant-baseline="central" transform="rotate(137.14 1082.27 1104.22)">限</text>
+    <text x="980.06" y="1173.90" dominant-baseline="central" transform="rotate(154.29 980.06 1173.90)">幻</text>
+    <text x="861.85" y="1210.36" dominant-baseline="central" transform="rotate(171.43 861.85 1210.36)">夢</text>
+    <text x="738.15" y="1210.36" dominant-baseline="central" transform="rotate(188.57 738.15 1210.36)">光</text>
+    <text x="619.94" y="1173.90" dominant-baseline="central" transform="rotate(205.71 619.94 1173.90)">闇</text>
+    <text x="517.73" y="1104.22" dominant-baseline="central" transform="rotate(222.86 517.73 1104.22)">星</text>
+    <text x="440.60" y="1007.50" dominant-baseline="central" transform="rotate(240.00 440.60 1007.50)">月</text>
+    <text x="395.40" y="892.35" dominant-baseline="central" transform="rotate(257.14 395.40 892.35)">日</text>
+    <text x="386.16" y="768.99" dominant-baseline="central" transform="rotate(274.29 386.16 768.99)">界</text>
+    <text x="413.69" y="648.38" dominant-baseline="central" transform="rotate(291.43 413.69 648.38)">龍</text>
+    <text x="475.54" y="541.25" dominant-baseline="central" transform="rotate(308.57 475.54 541.25)">神</text>
+    <text x="566.22" y="457.11" dominant-baseline="central" transform="rotate(325.71 566.22 457.11)">聖</text>
+    <text x="677.68" y="403.44" dominant-baseline="central" transform="rotate(342.86 677.68 403.44)">魔</text>
+  </g>
+</svg>

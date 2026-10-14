@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1600" viewBox="0 0 1600 1600" fill="none">
+  <!-- ring 1: seed-of-life interlocking circles -->
+  <g stroke="#3A3632" stroke-width="1.3" fill="none">
+    <circle cx="800.00" cy="800.00" r="70.00"  />
+    <circle cx="800.00" cy="800.00" r="150.00"  />
+  </g>
+  <g stroke="#B5633D" stroke-width="1.5" fill="none">
+    <circle cx="800.00" cy="800.00" r="95.00" stroke="#1A1A1A" />
+    <circle cx="895.00" cy="800.00" r="95.00"  />
+    <circle cx="847.50" cy="882.27" r="95.00"  />
+    <circle cx="752.50" cy="882.27" r="95.00"  />
+    <circle cx="705.00" cy="800.00" r="95.00"  />
+    <circle cx="752.50" cy="717.73" r="95.00"  />
+    <circle cx="847.50" cy="717.73" r="95.00"  />
+  </g>
+  <g fill="#B5633D">
+    <circle cx="800.00" cy="800.00" r="7.00"  />
+  </g>
+</svg>

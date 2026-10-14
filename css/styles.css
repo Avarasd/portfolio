@@ -41,7 +41,7 @@
      --accent-3: the warm red/coral from the right side.
      Both derive from the drifting hue so they shift in sympathy with
      the primary accent instead of looking pinned-on. */
-  --accent-2: hsl(calc(var(--accent-hue) - 110) 78% 62%);
+  --accent-2: hsl(calc(var(--accent-hue) + 250) 78% 62%);
   /* blue-violet */
   --accent-3: hsl(calc(var(--accent-hue) + 20) 85% 60%);
   /* red / coral */
@@ -567,11 +567,11 @@ em {
 }
 
 /* Each nav link is a gradient tinted toward the accent of the section it
-   points to — the same per-section color used by that section's number
-   and header. Links are in the same order as the sections, so the accent
-   cycle lines up: pink, blue-violet, red-coral, pink, blue-violet. */
+   points to. The links use the same continuous hue ramp as the sections,
+   so the top bar flows through the same color journey (pink -> orchid ->
+   violet -> blue-violet) that scrolling the page does. */
 .nav a {
-  --link-accent: var(--accent);
+  --link-accent: hsl(var(--accent-hue) 70% 60%);
   position: relative;
   padding: 0.25rem 0;
   background-image: linear-gradient(100deg,
@@ -583,12 +583,20 @@ em {
   transition: filter 0.25s var(--ease);
 }
 
-.nav a:nth-child(3n + 2) {
-  --link-accent: var(--accent-2);
+.nav a:nth-child(2) {
+  --link-accent: hsl(calc(var(--accent-hue) + 332) 70% 60%);
 }
 
-.nav a:nth-child(3n + 3) {
-  --link-accent: var(--accent-3);
+.nav a:nth-child(3) {
+  --link-accent: hsl(calc(var(--accent-hue) + 304) 70% 60%);
+}
+
+.nav a:nth-child(4) {
+  --link-accent: hsl(calc(var(--accent-hue) + 276) 70% 60%);
+}
+
+.nav a:nth-child(5) {
+  --link-accent: hsl(calc(var(--accent-hue) + 248) 70% 60%);
 }
 
 .nav a::after {
@@ -819,61 +827,7 @@ em {
   max-width: 40ch;
   font-size: clamp(1.1rem, 1rem + 0.6vw, 1.4rem);
   color: var(--ink-soft);
-  margin-bottom: 2.25rem;
-}
-
-.hero-actions {
-  display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
-}
-
-/* ---------- Buttons ---------- */
-.btn {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.75rem 1.5rem;
-  font-size: 0.95rem;
-  font-weight: 500;
-  /* Each button's accent matches the section it links to (set below). */
-  --btn-accent: var(--accent);
-  /* Filled button: a gradient from ink into the target-section accent. */
-  background-image: linear-gradient(100deg,
-      var(--ink) 25%,
-      var(--btn-accent) 115%);
-  color: var(--bg-alt);
-  border: 1px solid transparent;
-  border-radius: 2px;
-  transition: background 0.25s var(--ease), color 0.25s var(--ease),
-    transform 0.2s var(--ease), box-shadow 0.25s var(--ease);
-}
-
-/* "View work" -> #projects (accent-2), "Get in touch" -> #contact
-   (also accent-2). Set explicitly so each matches its destination. */
-.hero-actions .btn[href="#projects"] {
-  --btn-accent: var(--accent-2);
-}
-
-.hero-actions .btn[href="#contact"] {
-  --btn-accent: var(--accent-2);
-}
-
-.btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 22px -10px var(--btn-accent);
-}
-
-/* Ghost button: transparent fill, but the text and border carry the
-   accent gradient instead of a solid ink background. */
-.btn-ghost {
-  background-image: none;
-  background-color: transparent;
-  color: var(--btn-accent);
-  border-color: color-mix(in srgb, var(--btn-accent) 55%, transparent);
-}
-
-.btn-ghost:hover {
-  color: var(--bg-alt);
+  margin-bottom: 0;
 }
 
 /* ---------- Sections ---------- */
@@ -891,17 +845,43 @@ em {
 
 /* Each section carries one accent that both its number and its header
    gradient use, so a header always ends in the same color as the number
-   beside it. The accent cycles as you scroll down the page. */
+   beside it.
+
+   The accents form one CONTINUOUS hue ramp down the page: each section's
+   color is the drifting base hue minus a progressive offset, so scrolling
+   glides smoothly from the warm magenta-pink at the top through to the
+   cool blue-violet at the bottom — adjacent sections are always close in
+   color. Built from --accent-hue so it still breathes with the live
+   palette. */
 .section {
-  --sec-accent: var(--accent);
+  --sec-sat: 70%;
+  --sec-light: 60%;
+  --sec-accent: hsl(var(--sec-hue) var(--sec-sat) var(--sec-light));
 }
 
-.section:nth-of-type(3n + 2) {
-  --sec-accent: var(--accent-2);
+/* Smooth ramp stepping backward through the wheel. We ADD (360 - offset)
+   instead of subtracting, so the hue value never goes negative — a
+   negative hue made some engines reject the hsl() and the header (which
+   is gradient-clipped to transparent) vanished entirely. Hue wraps mod
+   360, so these land on the same colors as -28, -56, -84, -112 would. */
+.section:nth-of-type(1) {
+  --sec-hue: var(--accent-hue);
 }
 
-.section:nth-of-type(3n + 3) {
-  --sec-accent: var(--accent-3);
+.section:nth-of-type(2) {
+  --sec-hue: calc(var(--accent-hue) + 332);
+}
+
+.section:nth-of-type(3) {
+  --sec-hue: calc(var(--accent-hue) + 304);
+}
+
+.section:nth-of-type(4) {
+  --sec-hue: calc(var(--accent-hue) + 276);
+}
+
+.section:nth-of-type(5) {
+  --sec-hue: calc(var(--accent-hue) + 248);
 }
 
 .section-no {
@@ -1220,7 +1200,9 @@ em {
   font-size: 0.78rem;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: var(--accent);
+  /* Match the Toolkit section's own accent (same color as the header
+     and the "03" number above). */
+  color: var(--sec-accent);
   margin-bottom: 1rem;
   padding-bottom: 0.75rem;
   border-bottom: 1px solid var(--line);
@@ -1368,8 +1350,7 @@ em {
 /* Each hero element rises in on load, staggered. */
 .hero .eyebrow,
 .hero-title .line,
-.hero-lead,
-.hero-actions {
+.hero-lead {
   opacity: 0;
   transform: translateY(26px);
   animation: heroRise 1s var(--ease) forwards;
@@ -1389,10 +1370,6 @@ em {
 
 .hero-lead {
   animation-delay: 0.6s;
-}
-
-.hero-actions {
-  animation-delay: 0.75s;
 }
 
 @keyframes heroRise {
@@ -1427,37 +1404,6 @@ em {
   border-color: var(--muted);
 }
 
-/* Buttons: subtle terracotta fill-sweep */
-.btn {
-  position: relative;
-  overflow: hidden;
-}
-
-.btn::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  /* Hover sweep in the button's own accent. */
-  background-image: linear-gradient(100deg,
-      var(--btn-accent) 0%,
-      color-mix(in srgb, var(--btn-accent) 70%, var(--ink)) 100%);
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 0.45s var(--ease);
-  z-index: -1;
-}
-
-.btn:hover::before {
-  transform: scaleX(1);
-}
-
-/* The ghost button fills with its accent on hover (text already turns
-   to the bg color via .btn-ghost:hover). */
-.btn-ghost::before {
-  background-image: none;
-  background-color: var(--btn-accent);
-}
-
 /* Brand mark subtle shift on hover */
 .brand {
   transition: letter-spacing 0.4s var(--ease);
@@ -1484,8 +1430,7 @@ em {
 
   .hero .eyebrow,
   .hero-title .line,
-  .hero-lead,
-  .hero-actions {
+  .hero-lead {
     opacity: 1;
     transform: none;
     animation: none;
@@ -1539,10 +1484,6 @@ em {
 
   .ring-4 {
     opacity: 0.045;
-  }
-
-  .btn:hover {
-    transform: none;
   }
 
   .project:hover .project-title {

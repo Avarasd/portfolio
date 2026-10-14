@@ -566,11 +566,29 @@ em {
   font-size: 0.9rem;
 }
 
+/* Each nav link is a gradient tinted toward the accent of the section it
+   points to — the same per-section color used by that section's number
+   and header. Links are in the same order as the sections, so the accent
+   cycle lines up: pink, blue-violet, red-coral, pink, blue-violet. */
 .nav a {
-  color: var(--ink-soft);
+  --link-accent: var(--accent);
   position: relative;
   padding: 0.25rem 0;
-  transition: color 0.25s var(--ease);
+  background-image: linear-gradient(100deg,
+      var(--ink-soft) 15%,
+      var(--link-accent) 95%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  transition: filter 0.25s var(--ease);
+}
+
+.nav a:nth-child(3n + 2) {
+  --link-accent: var(--accent-2);
+}
+
+.nav a:nth-child(3n + 3) {
+  --link-accent: var(--accent-3);
 }
 
 .nav a::after {
@@ -580,14 +598,16 @@ em {
   bottom: -2px;
   width: 100%;
   height: 1px;
-  background: var(--ink);
+  /* Underline uses the same per-link accent. */
+  background: var(--link-accent);
   transform: scaleX(0);
   transform-origin: left;
   transition: transform 0.3s var(--ease);
 }
 
 .nav a:hover {
-  color: var(--ink);
+  /* Brighten the gradient a touch on hover. */
+  filter: brightness(1.18) saturate(1.1);
 }
 
 .nav a:hover::after {
@@ -728,32 +748,23 @@ em {
 .hero-title .italic {
   font-style: italic;
   /* Your first name "Avar": a clear two-tone wash — the normal ink
-     easing into the full accent across the word, so the gradient is
-     plainly visible. Padding so serif ascenders aren't clipped. */
+     easing into the accent across the word. Uses --grad-b (the same
+     bright, theme-tuned accent as the brand/headers) so it stays
+     clearly visible in dark mode, where the raw --accent is too dark
+     against the near-black background. */
   background: linear-gradient(102deg,
-      var(--ink) 8%,
-      var(--accent) 85%);
-  background-size: 140% 100%;
+      var(--grad-a) 0%,
+      var(--grad-b) 75%);
+  /* Exactly fill the word (no oversized sliding window that would park
+     the visible part on the pale ink end and hide the color). */
+  background-size: 100% 100%;
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
   padding-top: 0.08em;
-  /* Run BOTH the intro rise (once) and the sheen (looping). Without the
-     heroRise here, this rule would override the .line rule's animation
-     and leave the span stuck at opacity: 0 — i.e. invisible. The sheen
-     is delayed until the rise finishes. */
-  animation: heroRise 1s var(--ease) 0.45s forwards,
-    nameSheen 11s ease-in-out 1.4s infinite alternate;
-}
-
-@keyframes nameSheen {
-  from {
-    background-position: 0% 50%;
-  }
-
-  to {
-    background-position: 100% 50%;
-  }
+  /* Only the intro rise animates. The gradient itself is static so it is
+     always clearly visible rather than sweeping in and out of view. */
+  animation: heroRise 1s var(--ease) 0.45s forwards;
 }
 
 /* ---------- Reusable subtle gradient text ----------
@@ -824,24 +835,44 @@ em {
   padding: 0.75rem 1.5rem;
   font-size: 0.95rem;
   font-weight: 500;
-  background: var(--ink);
+  /* Each button's accent matches the section it links to (set below). */
+  --btn-accent: var(--accent);
+  /* Filled button: a gradient from ink into the target-section accent. */
+  background-image: linear-gradient(100deg,
+      var(--ink) 25%,
+      var(--btn-accent) 115%);
   color: var(--bg-alt);
-  border: 1px solid var(--ink);
+  border: 1px solid transparent;
   border-radius: 2px;
-  transition: background 0.25s var(--ease), color 0.25s var(--ease), transform 0.2s var(--ease);
+  transition: background 0.25s var(--ease), color 0.25s var(--ease),
+    transform 0.2s var(--ease), box-shadow 0.25s var(--ease);
+}
+
+/* "View work" -> #projects (accent-2), "Get in touch" -> #contact
+   (also accent-2). Set explicitly so each matches its destination. */
+.hero-actions .btn[href="#projects"] {
+  --btn-accent: var(--accent-2);
+}
+
+.hero-actions .btn[href="#contact"] {
+  --btn-accent: var(--accent-2);
 }
 
 .btn:hover {
   transform: translateY(-2px);
+  box-shadow: 0 8px 22px -10px var(--btn-accent);
 }
 
+/* Ghost button: transparent fill, but the text and border carry the
+   accent gradient instead of a solid ink background. */
 .btn-ghost {
-  background: transparent;
-  color: var(--ink);
+  background-image: none;
+  background-color: transparent;
+  color: var(--btn-accent);
+  border-color: color-mix(in srgb, var(--btn-accent) 55%, transparent);
 }
 
 .btn-ghost:hover {
-  background: var(--ink);
   color: var(--bg-alt);
 }
 
@@ -1406,7 +1437,10 @@ em {
   content: "";
   position: absolute;
   inset: 0;
-  background: var(--accent);
+  /* Hover sweep in the button's own accent. */
+  background-image: linear-gradient(100deg,
+      var(--btn-accent) 0%,
+      color-mix(in srgb, var(--btn-accent) 70%, var(--ink)) 100%);
   transform: scaleX(0);
   transform-origin: left;
   transition: transform 0.45s var(--ease);
@@ -1417,8 +1451,11 @@ em {
   transform: scaleX(1);
 }
 
+/* The ghost button fills with its accent on hover (text already turns
+   to the bg color via .btn-ghost:hover). */
 .btn-ghost::before {
-  background: var(--ink);
+  background-image: none;
+  background-color: var(--btn-accent);
 }
 
 /* Brand mark subtle shift on hover */

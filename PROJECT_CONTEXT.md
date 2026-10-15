@@ -282,6 +282,64 @@ validate with `[xml](Get-Content assets/x.svg -Raw)`, then DELETE the script.
 
 ## 9. Project cards (`.project`)
 
+- Three real projects (Chess TUI, Doppler Effect App, YouTube to WAV), each a
+  3-column grid: `.project-index` (NN) · `.project-content` · `.project-media`
+  (image). Content is just the title, a short summary (`.project-desc`), and a
+  single "Repository ↗" link (`.project-links`). **The old `.project-meta`
+  (TECH · ROLE · YEAR) and `.project-tags` pill boxes were DELETED as
+  clutter — don't re-add them.**
+- `.project-media` is a 16:10 squircle thumbnail. The `<img>`s point at
+  `assets/project-chess-tui.gif` (a REAL animated terminal demo — the only
+  media present so far), `assets/project-doppler.png` and
+  `assets/project-youtube-to-wav.png`. Each has `onerror="this.remove()"`,
+  so a still-missing file (the two `.png`s) removes its broken image and the
+  wrapper's faint palette-tinted placeholder shows instead. **To finish:
+  drop real screenshots at the two `.png` paths.** On tablet (≤820px) the
+  media moves below the text; on mobile (≤560px) the card is single-column
+  and the index is hidden.
+- **Click-to-zoom lightbox**: `js/main.js` turns every `.project-media` that
+  has a working `<img>` into a zoomable control (`.is-zoomable`,
+  `role="button"`, `tabindex=0`, zoom-in cursor, a small expand glyph that
+  fades in on hover/focus). Click / Enter / Space opens a single injected
+  `.lightbox` overlay. Closes on backdrop click, the `.lightbox-close`
+  button, or Escape; focus moves to the close button on open and returns to
+  the trigger on close; body scroll is locked while open. Boxes whose image
+  404s (the two placeholder `.png`s) get the zoom affordance stripped via the
+  img `error` handler, so only real images are clickable. Reduced-motion
+  removes the open/scale transition.
+  - **Backdrop**: NO tinted color overlay — it's a strong `backdrop-filter:
+    blur(22px) saturate(1.05)` (with `-webkit-` prefix) over a barely-there
+    `--bg 8%` dim. The owner explicitly wanted blur-only, not a dark wash.
+    Don't re-add an ink-tinted backdrop.
+  - **Close button** (`.lightbox-close`): a thin-ringed CIRCULAR mark (46px,
+    `border-radius:50%`) echoing the delicate line-art of the owner's
+    inspiration images, driven by palette tokens so it differs per theme.
+    Light: `--bg 70%` disc, `--accent` ring + glyph; hover fills with
+    `--accent`, glyph → `--bg`, soft accent halo, rotates 90°. Dark
+    (`[data-theme="dark"]` override): resting background is
+    `color-mix(--bg-alt 92%, --accent)` — a solid lifted-black disc with a
+    faint oxblood wash (an earlier translucent-ink fill read as muddy grey
+    and was rejected); hover fills `--accent` with `--ink` glyph. Keeps
+    `aria-label`, accent focus-visible ring, reduced-motion drops the rotate.
+    **Light mode is owner-approved — leave it; only dark was iterated on.**
+  - **Caption** (`.lightbox-caption`): uses the site's eyebrow idiom — small
+    (0.74rem) uppercase, 0.22em letter-spacing, `--accent` color (NOT the old
+    italic serif). Has `margin: 20px 0 0` to clear the image's downward
+    drop-shadow so it sits in the clean blurred space below the frame.
+  - **Image** (`.lightbox-img`): squircle (14px), `--accent 30%` border,
+    palette-aware shadow `0 24px 60px -24px (--ink 45%)` (not pure black).
+  - Inspiration refs on disk: `assets/inspiration_light_mode.jpg` (pink→blue
+    gradient line-art) and `assets/inspiration_dark_mode.png` (etched
+    red-on-black). Kept for future reference.
+- **Project image aesthetic treatment** (`.project-media img`): at rest the
+  image is slightly dampened so it blends into the palette instead of
+  popping as a hard rectangle — a per-theme `filter` (light: `saturate(.82)
+  brightness(1.04) contrast(.96)` to soften the near-black Chess GIF against
+  the blush bg; dark: `saturate(.8) brightness(.95)`) plus `opacity: .9`. On
+  `.project:hover` / `.project:focus-within` it lifts to full color
+  (`filter: none`, `opacity: 1`) with a subtle `scale(1.03)`. Under
+  reduced-motion the scale/opacity transition is removed (the GIF's own
+  animation can't be paused from CSS).
 - Squircle (border-radius 26px), transparent until hover. On hover: soft
   tinted fill, lift (translateY -2px), accent-colored shadow ring, title
   slides right, divider lines fade. Bubbles float up behind the content
@@ -316,9 +374,13 @@ There is no build/test suite. Verify visually by opening index.html or
 
 ## 12. Git state
 
-Repo exists, only commit so far is "Initial commit"; the whole site is
-new/uncommitted. When committing, stage files explicitly (not `git add .`),
-push to a new branch not main unless told, and only commit when asked.
+Active history (most recent last): initial commit → themed animated UI →
+gradient fixes → color/cleanup → multi-page split + header/gradient/footer
+refine → soften mandala + real contact links → copy-email envelope → README
+rewrite → **lightbox: blur-only backdrop, themed circular close button,
+eyebrow-style caption** (this commit). When committing, stage files
+explicitly (not `git add .`), only commit when asked. The owner drives the
+remote; push to a new branch rather than main unless told otherwise.
 
 ## 13. Owner working style (important)
 

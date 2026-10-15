@@ -1051,7 +1051,9 @@ em {
 .project {
   position: relative;
   display: grid;
-  grid-template-columns: auto 1fr;
+  /* index · text content · media (image) */
+  grid-template-columns: auto 1fr clamp(180px, 26vw, 300px);
+  align-items: center;
   gap: clamp(1rem, 4vw, 3rem);
   padding: clamp(1.5rem, 3.5vh, 2.4rem) clamp(1.1rem, 2.5vw, 2rem);
   /* squircle: large smooth radius */
@@ -1230,7 +1232,6 @@ em {
   font-size: 0.85rem;
   color: var(--muted);
   font-variant-numeric: tabular-nums;
-  padding-top: 0.4rem;
 }
 
 .project-title {
@@ -1275,33 +1276,232 @@ em {
   --proj-hue: calc(var(--accent-hue) + 90);
 }
 
-.project-meta {
-  font-size: 0.85rem;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--muted);
-  margin-bottom: 1rem;
-}
-
 .project-desc {
   max-width: 60ch;
+  margin-bottom: 1.1rem;
   color: var(--ink-soft);
 }
 
-.project-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin: 1.25rem 0;
-}
-
-.project-tags li {
-  font-size: 0.78rem;
-  letter-spacing: 0.03em;
-  padding: 0.25rem 0.7rem;
+/* ---- Project image ----
+   A squircle thumbnail on the right of each card. The wrapper carries a
+   faint palette-tinted placeholder so an as-yet-missing screenshot still
+   reads as an intentional image slot (the <img> removes itself on error
+   via onerror, leaving this backdrop). */
+.project-media {
+  position: relative;
+  align-self: center;
+  aspect-ratio: 16 / 10;
+  border-radius: 16px;
+  overflow: hidden;
+  background:
+    linear-gradient(135deg,
+      color-mix(in srgb, var(--accent) 12%, transparent),
+      color-mix(in srgb, var(--ink) 6%, transparent));
   border: 1px solid var(--line);
-  border-radius: 100px;
-  color: var(--ink-soft);
+}
+
+/* JS adds .is-zoomable once a working image is present → the media reads
+   as clickable (click / Enter / Space opens the lightbox). */
+.project-media.is-zoomable {
+  cursor: zoom-in;
+}
+
+.project-media.is-zoomable:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+/* A small "expand" glyph in the corner hints the image can be opened. It
+   fades in on hover / focus so it doesn't clutter the resting card. */
+.project-media.is-zoomable::after {
+  content: "";
+  position: absolute;
+  top: 0.55rem;
+  right: 0.55rem;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 7px;
+  background: color-mix(in srgb, var(--bg) 70%, transparent) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23808080' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M9 3H3v6M15 3h6v6M9 21H3v-6M15 21h6v-6'/></svg>") center / 0.95rem no-repeat;
+  backdrop-filter: blur(2px);
+  opacity: 0;
+  transition: opacity 0.3s var(--ease);
+  pointer-events: none;
+}
+
+.project:hover .project-media.is-zoomable::after,
+.project-media.is-zoomable:focus-visible::after {
+  opacity: 0.9;
+}
+
+.project-media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* Rest state: slightly dampened so the image sits INTO the palette
+     rather than popping as a hard rectangle. On hover it lifts to full
+     color and clarity. Per-theme tuning below. */
+  opacity: 0.9;
+  transition: opacity 0.45s var(--ease), filter 0.45s var(--ease),
+    transform 0.6s var(--ease);
+}
+
+[data-theme="light"] .project-media img {
+  filter: saturate(0.82) brightness(1.04) contrast(0.96);
+}
+
+[data-theme="dark"] .project-media img {
+  filter: saturate(0.8) brightness(0.95);
+}
+
+.project:hover .project-media img,
+.project:focus-within .project-media img {
+  opacity: 1;
+  filter: none;
+  transform: scale(1.03);
+}
+
+/* ---------- Lightbox (click-to-zoom) ----------
+   One overlay per page, injected by JS. No tinted backdrop — the page
+   behind is simply blurred heavily so the enlarged image reads clean. */
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: clamp(1.5rem, 5vw, 4rem);
+  /* Barely-there dim so pale images still have an edge; the real work
+     is done by a strong blur of whatever sits behind. */
+  background: color-mix(in srgb, var(--bg) 8%, transparent);
+  backdrop-filter: blur(22px) saturate(1.05);
+  -webkit-backdrop-filter: blur(22px) saturate(1.05);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s var(--ease), visibility 0.3s var(--ease);
+}
+
+.lightbox.is-open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.lightbox-figure {
+  margin: 0;
+  max-width: min(1000px, 100%);
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.9rem;
+  transform: scale(0.96);
+  transition: transform 0.3s var(--ease);
+}
+
+.lightbox.is-open .lightbox-figure {
+  transform: scale(1);
+}
+
+.lightbox-img {
+  display: block;
+  max-width: 100%;
+  max-height: 78vh;
+  object-fit: contain;
+  border-radius: 14px;
+  border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+  box-shadow: 0 24px 60px -24px color-mix(in srgb, var(--ink) 45%, transparent);
+  background: var(--bg);
+}
+
+/* Caption uses the site's eyebrow idiom: small uppercase letter-spaced
+   sans in the accent hue, so it reads as a label rather than a quote. */
+.lightbox-caption {
+  /* Clear the image's downward drop-shadow so the label reads against the
+     blurred page, not the dark falloff beneath the frame. */
+  margin: 20px 0 0;
+  font-size: 0.74rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--accent);
+  text-align: center;
+  max-width: 60ch;
+}
+
+/* Close button — a thin-ringed circular mark that echoes the delicate
+   line-art of the inspiration pieces. Palette-driven, so it reads warm
+   in light mode and inverts cleanly in dark mode (see overrides below). */
+.lightbox-close {
+  position: absolute;
+  top: clamp(1rem, 3vw, 2rem);
+  right: clamp(1rem, 3vw, 2rem);
+  width: 46px;
+  height: 46px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px solid color-mix(in srgb, var(--accent) 55%, transparent);
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--bg) 70%, transparent);
+  color: var(--accent);
+  font-size: 1.15rem;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 40%, transparent);
+  transition: background-color 0.25s var(--ease), color 0.25s var(--ease),
+    border-color 0.25s var(--ease), box-shadow 0.3s var(--ease),
+    transform 0.3s var(--ease);
+}
+
+.lightbox-close:hover {
+  background: var(--accent);
+  color: var(--bg);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 6px color-mix(in srgb, var(--accent) 18%, transparent);
+  transform: rotate(90deg);
+}
+
+.lightbox-close:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+/* Dark mode: a quieter ink-backed disc with the accent as the glyph,
+   nodding to the etched-on-black feel of the dark inspiration image. */
+[data-theme="dark"] .lightbox-close {
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--line));
+  /* Solid lifted-black disc with a faint oxblood wash — crisp against the
+     blur and firmly in the gothic palette, rather than a muddy grey veil. */
+  background: color-mix(in srgb, var(--bg-alt) 92%, var(--accent));
+  color: var(--accent);
+}
+
+[data-theme="dark"] .lightbox-close:hover {
+  background: var(--accent);
+  color: var(--ink);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 6px color-mix(in srgb, var(--accent) 22%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .lightbox,
+  .lightbox-figure {
+    transition: none;
+  }
+
+  .lightbox-figure,
+  .lightbox.is-open .lightbox-figure {
+    transform: none;
+  }
+
+  .lightbox-close:hover {
+    transform: none;
+  }
 }
 
 .project-links {
@@ -1321,6 +1521,20 @@ em {
   color: var(--accent-3);
 }
 
+/* Tablet: image drops under the text so the card doesn't get cramped. */
+@media (max-width: 820px) {
+  .project {
+    grid-template-columns: auto 1fr;
+    align-items: start;
+  }
+
+  .project-media {
+    grid-column: 1 / -1;
+    width: 100%;
+    max-width: 420px;
+  }
+}
+
 @media (max-width: 560px) {
   .project {
     grid-template-columns: 1fr;
@@ -1328,6 +1542,10 @@ em {
 
   .project-index {
     display: none;
+  }
+
+  .project-media {
+    max-width: none;
   }
 }
 
@@ -1342,8 +1560,7 @@ em {
   font-size: 0.78rem;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  /* Match the Toolkit section's own accent (same color as the header
-     and the "03" number above). */
+  /* Match the Toolkit section's own accent. */
   color: var(--sec-accent);
   margin-bottom: 1rem;
   padding-bottom: 0.75rem;
@@ -1510,14 +1727,6 @@ em {
   transform: translateX(8px);
 }
 
-.project-tags li {
-  transition: border-color 0.3s var(--ease), color 0.3s var(--ease);
-}
-
-.project:hover .project-tags li {
-  border-color: var(--muted);
-}
-
 /* Brand mark subtle shift on hover */
 .brand {
   transition: letter-spacing 0.4s var(--ease);
@@ -1608,6 +1817,17 @@ em {
 
   .project:hover {
     transform: none;
+  }
+
+  /* Don't add motion to the project image; keep it fully clear and still
+     (the GIF's own animation can't be paused from CSS, but we avoid the
+     extra zoom/opacity transition). */
+  .project-media img,
+  .project:hover .project-media img,
+  .project:focus-within .project-media img {
+    opacity: 1;
+    transform: none;
+    transition: none;
   }
 
   .bubble {

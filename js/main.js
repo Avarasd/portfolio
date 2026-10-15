@@ -243,4 +243,114 @@
       );
     });
   });
+
+  // --- Click-to-zoom lightbox for project media ---
+  // Each .project-media that actually has an image becomes a button that
+  // opens the image enlarged in an overlay. Closes on backdrop click, the
+  // close button, or Escape; focus is moved into the lightbox and restored
+  // to the trigger afterwards.
+  var mediaBoxes = Array.prototype.slice.call(
+    document.querySelectorAll(".project-media")
+  ).filter(function (box) {
+    return box.querySelector("img");
+  });
+
+  if (mediaBoxes.length) {
+    // Build one reusable overlay.
+    var lightbox = document.createElement("div");
+    lightbox.className = "lightbox";
+    lightbox.setAttribute("role", "dialog");
+    lightbox.setAttribute("aria-modal", "true");
+    lightbox.setAttribute("aria-hidden", "true");
+    lightbox.innerHTML =
+      '<button type="button" class="lightbox-close" aria-label="Close">\u2715</button>' +
+      '<figure class="lightbox-figure">' +
+      '<img class="lightbox-img" alt="" />' +
+      '<figcaption class="lightbox-caption"></figcaption>' +
+      "</figure>";
+    document.body.appendChild(lightbox);
+
+    var lightboxImg = lightbox.querySelector(".lightbox-img");
+    var lightboxCaption = lightbox.querySelector(".lightbox-caption");
+    var lightboxClose = lightbox.querySelector(".lightbox-close");
+    var lastTrigger = null;
+
+    var openLightbox = function (box) {
+      var img = box.querySelector("img");
+      if (!img) return;
+      lastTrigger = box;
+      // currentSrc handles any responsive source; falls back to src.
+      lightboxImg.src = img.currentSrc || img.src;
+      lightboxImg.alt = img.alt || "";
+      lightboxCaption.textContent = img.alt || "";
+      lightbox.classList.add("is-open");
+      lightbox.setAttribute("aria-hidden", "false");
+      // Lock background scroll while open.
+      document.body.style.overflow = "hidden";
+      lightboxClose.focus();
+    };
+
+    var closeLightbox = function () {
+      if (!lightbox.classList.contains("is-open")) return;
+      lightbox.classList.remove("is-open");
+      lightbox.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+      // Clear the src after the fade so a large GIF stops decoding.
+      window.setTimeout(function () {
+        if (!lightbox.classList.contains("is-open")) lightboxImg.src = "";
+      }, 320);
+      if (lastTrigger) {
+        lastTrigger.focus();
+        lastTrigger = null;
+      }
+    };
+
+    var makeZoomable = function (box) {
+      box.classList.add("is-zoomable");
+      box.setAttribute("role", "button");
+      box.setAttribute("tabindex", "0");
+      var img = box.querySelector("img");
+      box.setAttribute(
+        "aria-label",
+        "Enlarge image" + (img && img.alt ? ": " + img.alt : "")
+      );
+    };
+
+    var unmakeZoomable = function (box) {
+      box.classList.remove("is-zoomable");
+      box.removeAttribute("role");
+      box.removeAttribute("tabindex");
+      box.removeAttribute("aria-label");
+    };
+
+    mediaBoxes.forEach(function (box) {
+      makeZoomable(box);
+      var img = box.querySelector("img");
+      // If the image later fails to load (onerror removes it), strip the
+      // zoom affordance so there's nothing to click into.
+      if (img) {
+        img.addEventListener("error", function () {
+          unmakeZoomable(box);
+        });
+      }
+      box.addEventListener("click", function () {
+        openLightbox(box);
+      });
+      box.addEventListener("keydown", function (e) {
+        if (e.key === "Enter" || e.key === " " || e.key === "Spacebar") {
+          e.preventDefault();
+          openLightbox(box);
+        }
+      });
+    });
+
+    lightboxClose.addEventListener("click", closeLightbox);
+    // Click on the backdrop (but not the figure) closes.
+    lightbox.addEventListener("click", function (e) {
+      if (e.target === lightbox) closeLightbox();
+    });
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") closeLightbox();
+    });
+  }
 })();

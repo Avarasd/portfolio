@@ -73,6 +73,75 @@
     media.addListener(onSchemeChange);
   }
 
+  // --- Mobile menu (hamburger) ---
+  // The slide-down panel is markup-present but [hidden] so a no-JS load
+  // keeps it collapsed. Here we take over: drop [hidden] once, then
+  // toggle an .is-open class (CSS animates the height) and keep
+  // aria-expanded in sync. Closes on link tap, Escape, outside click,
+  // and when the viewport grows back to the desktop layout.
+  var navToggle = document.getElementById("nav-toggle");
+  var mobileMenu = document.getElementById("mobile-menu");
+
+  if (navToggle && mobileMenu) {
+    // Managed by class from now on; remove the attribute so CSS controls it.
+    mobileMenu.removeAttribute("hidden");
+
+    var openMenu = function () {
+      mobileMenu.classList.add("is-open");
+      navToggle.setAttribute("aria-expanded", "true");
+      navToggle.setAttribute("aria-label", "Close menu");
+    };
+
+    var closeMenu = function () {
+      mobileMenu.classList.remove("is-open");
+      navToggle.setAttribute("aria-expanded", "false");
+      navToggle.setAttribute("aria-label", "Open menu");
+    };
+
+    navToggle.addEventListener("click", function () {
+      if (mobileMenu.classList.contains("is-open")) {
+        closeMenu();
+      } else {
+        openMenu();
+      }
+    });
+
+    // Tapping a page link navigates; close the panel so it isn't left
+    // open behind the new page / after an in-page jump.
+    mobileMenu.querySelectorAll("a").forEach(function (link) {
+      link.addEventListener("click", closeMenu);
+    });
+
+    // Escape closes and returns focus to the toggle.
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && mobileMenu.classList.contains("is-open")) {
+        closeMenu();
+        navToggle.focus();
+      }
+    });
+
+    // Tap outside the header/menu closes it.
+    document.addEventListener("click", function (e) {
+      if (!mobileMenu.classList.contains("is-open")) return;
+      if (mobileMenu.contains(e.target) || navToggle.contains(e.target)) {
+        return;
+      }
+      closeMenu();
+    });
+
+    // If the viewport grows past the mobile breakpoint, make sure the
+    // panel is closed so returning to mobile doesn't start half-open.
+    var desktopQuery = window.matchMedia("(min-width: 621px)");
+    var onDesktopChange = function (e) {
+      if (e.matches) closeMenu();
+    };
+    if (typeof desktopQuery.addEventListener === "function") {
+      desktopQuery.addEventListener("change", onDesktopChange);
+    } else if (typeof desktopQuery.addListener === "function") {
+      desktopQuery.addListener(onDesktopChange);
+    }
+  }
+
   // --- Auto-tag section headings so they animate in too ---
   document.querySelectorAll(".section-head").forEach(function (el) {
     el.classList.add("reveal");

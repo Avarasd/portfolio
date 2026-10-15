@@ -1926,3 +1926,293 @@ em {
     filter: none;
   }
 }
+
+/* ============================================================
+   Mobile header + navigation (phones only, <= 620px)
+   ------------------------------------------------------------
+   The desktop header is a 3-zone grid (contact+brand / centered nav /
+   theme toggle) and the centered nav is already hidden below 620px.
+   On a phone that left the brand + three contact icons crammed on the
+   left with NO way to switch pages. These rules add a hamburger button
+   and a slide-down menu panel, and restructure the top bar for small
+   screens. Everything here is either a brand-new selector (.nav-toggle,
+   .mobile-menu, ...) that doesn't exist in the desktop layout, or lives
+   inside a (max-width: 620px) media query — so the desktop view is
+   untouched.
+   ============================================================ */
+
+/* The hamburger button and the mobile menu panel do not exist in the
+   desktop design: hide them until the narrow-screen media query opts
+   them back in. */
+.nav-toggle {
+  display: none;
+}
+
+.mobile-menu {
+  display: none;
+}
+
+/* The slide-down panel is positioned/animated by the mobile media query;
+   when the markup carries [hidden] it stays fully removed. */
+.mobile-menu[hidden] {
+  display: none;
+}
+
+@media (max-width: 620px) {
+
+  /* ----- Top bar: brand on the left, controls on the right -----
+     Drop the 3-column desktop grid (which centered the now-hidden nav)
+     for a simple two-end flex row: the brand reads as the anchor, the
+     theme toggle and hamburger sit together on the right. */
+  .header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    height: 60px;
+  }
+
+  /* The inline contact-icon cluster + its divider made the little bar
+     look busy and unstructured. On phones those links move INTO the
+     slide-down menu instead, so hide the header copy here. */
+  .header-left .header-contact {
+    display: none;
+  }
+
+  /* With the contact icons gone, the left cluster is just the brand. */
+  .header-left {
+    gap: 0;
+  }
+
+  .brand {
+    font-size: 1.2rem;
+  }
+
+  /* Group the theme toggle and the hamburger together at the right end. */
+  .theme-toggle {
+    justify-self: auto;
+  }
+
+  /* ----- Hamburger button ----- */
+  .nav-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    border: none;
+    background: none;
+    color: var(--ink-soft);
+    cursor: pointer;
+    border-radius: 9px;
+    transition: color 0.25s var(--ease), background-color 0.25s var(--ease);
+  }
+
+  .nav-toggle:hover {
+    color: var(--accent);
+    background-color: color-mix(in srgb, var(--accent) 10%, transparent);
+  }
+
+  .nav-toggle:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  /* Three bars that morph into an X when the menu is open. */
+  .nav-toggle-bars {
+    position: relative;
+    display: block;
+    width: 20px;
+    height: 14px;
+  }
+
+  .nav-toggle-bars span {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    border-radius: 2px;
+    background: currentColor;
+    transition: transform 0.3s var(--ease), opacity 0.2s var(--ease),
+      top 0.3s var(--ease);
+  }
+
+  .nav-toggle-bars span:nth-child(1) {
+    top: 0;
+  }
+
+  .nav-toggle-bars span:nth-child(2) {
+    top: 6px;
+  }
+
+  .nav-toggle-bars span:nth-child(3) {
+    top: 12px;
+  }
+
+  /* Open state: top + bottom bars cross, middle fades out. */
+  .nav-toggle[aria-expanded="true"] .nav-toggle-bars span:nth-child(1) {
+    top: 6px;
+    transform: rotate(45deg);
+  }
+
+  .nav-toggle[aria-expanded="true"] .nav-toggle-bars span:nth-child(2) {
+    opacity: 0;
+  }
+
+  .nav-toggle[aria-expanded="true"] .nav-toggle-bars span:nth-child(3) {
+    top: 6px;
+    transform: rotate(-45deg);
+  }
+
+  /* ----- Slide-down menu panel -----
+     Sits directly under the sticky header. Matches the header's frosted
+     look (translucent bg + blur) so it reads as an extension of the bar.
+     Collapsed by default via max-height:0; .is-open animates it open. */
+  .mobile-menu {
+    display: block;
+    overflow: hidden;
+    max-height: 0;
+    border-bottom: 1px solid transparent;
+    background: color-mix(in srgb, var(--bg) 92%, transparent);
+    backdrop-filter: saturate(140%) blur(8px);
+    -webkit-backdrop-filter: saturate(140%) blur(8px);
+    transition: max-height 0.38s var(--ease), border-color 0.38s var(--ease);
+  }
+
+  /* [hidden] is removed by JS as soon as the panel can animate; keep the
+     attribute selector harmless here so a no-JS load just stays closed. */
+  .mobile-menu[hidden] {
+    display: block;
+    max-height: 0;
+  }
+
+  .mobile-menu.is-open {
+    max-height: 70vh;
+    border-bottom-color: var(--line);
+  }
+
+  /* ----- Page links: big tappable rows ----- */
+  .mobile-nav {
+    display: flex;
+    flex-direction: column;
+    padding: 0.5rem var(--gutter) 0.75rem;
+  }
+
+  .mobile-nav a {
+    --link-accent: hsl(var(--accent-hue) 70% 60%);
+    display: block;
+    padding: 0.95rem 0.25rem;
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 1.6rem;
+    line-height: 1;
+    border-bottom: 1px solid var(--line);
+    /* Same forward hue ramp as the desktop nav so the menu flows through
+       the identical color journey (pink -> orchid -> violet). */
+    background-image: linear-gradient(100deg,
+        var(--ink-soft) 20%,
+        var(--link-accent) 95%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    padding-top: 0.95rem;
+    transition: filter 0.25s var(--ease), padding-left 0.25s var(--ease);
+  }
+
+  .mobile-nav a:nth-child(2) {
+    --link-accent: hsl(calc(var(--accent-hue) + 332) 70% 60%);
+  }
+
+  .mobile-nav a:nth-child(3) {
+    --link-accent: hsl(calc(var(--accent-hue) + 304) 70% 60%);
+  }
+
+  .mobile-nav a:last-child {
+    border-bottom: none;
+  }
+
+  .mobile-nav a:hover,
+  .mobile-nav a:focus-visible {
+    filter: brightness(1.18) saturate(1.1);
+    padding-left: 0.6rem;
+    outline: none;
+  }
+
+  /* The current page row reads as selected: brightened, with a small
+     accent tick to its left. */
+  .mobile-nav a[aria-current="page"] {
+    filter: brightness(1.18) saturate(1.1);
+    padding-left: 0.6rem;
+    position: relative;
+  }
+
+  .mobile-nav a[aria-current="page"]::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 1.1em;
+    border-radius: 2px;
+    background: var(--link-accent);
+  }
+
+  /* ----- Contact row at the bottom of the menu ----- */
+  .mobile-contact {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 1.25rem;
+    padding: 0.25rem var(--gutter) 1.1rem;
+  }
+
+  .mobile-contact-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.1rem;
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: var(--muted);
+    font-family: var(--sans);
+    font-size: 0.82rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    transition: color 0.25s var(--ease);
+  }
+
+  .mobile-contact-link:hover,
+  .mobile-contact-link:focus-visible {
+    color: var(--accent);
+    outline: none;
+  }
+
+  /* Keep the quiet "Copied" confirmation sensible inside the menu. */
+  .mobile-contact-link.copied {
+    color: var(--ink);
+  }
+
+  /* Tighten the content top padding a touch — on a phone the hero no
+     longer needs the big desktop lead-in and this keeps the first screen
+     from feeling empty under the taller interactive header. */
+  .hero {
+    padding-top: clamp(2.5rem, 8vh, 4rem);
+  }
+
+  .page-head {
+    padding-top: clamp(2rem, 7vh, 4rem);
+  }
+}
+
+/* Reduced-motion: the hamburger morph and the panel slide are motion;
+   neutralise them (the panel still opens/closes, just without the
+   animated height/transform). */
+@media (max-width: 620px) and (prefers-reduced-motion: reduce) {
+
+  .nav-toggle-bars span,
+  .mobile-menu {
+    transition: none;
+  }
+}

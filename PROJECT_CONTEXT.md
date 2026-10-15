@@ -108,6 +108,21 @@ The current page gets `aria-current="page"`. To the LEFT of the brand name
 sits `.header-contact` (email / GitHub / LinkedIn as small muted icon
 links). The theme toggle is a compact single-icon button (see §7).
 
+### Mobile header + navigation (phones, ≤620px) — see §7.1
+The desktop header is a 3-zone grid and the centered `.nav` is hidden
+below 620px. On a phone that left the brand + contact icons crammed with
+NO way to switch pages, so there is a separate **mobile layout** (all
+scoped to new selectors or a `@media (max-width: 620px)` block — the
+desktop view is byte-for-byte unchanged). Each page carries, after the
+theme toggle, a `.nav-toggle` hamburger button and (after it, still inside
+`<header>`) a `.mobile-menu` slide-down panel. The panel holds `.mobile-nav`
+(the three page links as large italic-serif rows, same forward hue ramp as
+the desktop nav, current page marked with an accent tick) and
+`.mobile-contact` (Copy email / GitHub / LinkedIn). The mobile Copy-email
+button reuses the existing `.copy-email` class so the §8 copy logic drives
+it automatically. The `.mobile-menu` ships with the `hidden` attribute so a
+no-JS load stays collapsed; JS removes it and takes over (see §8).
+
 ### Content is intentionally PLACEHOLDER
 Almost all prose is deliberate placeholder text marked with `PLACEHOLDER`
 comments (hero lead, about paragraphs, project descriptions, toolkit items,
@@ -253,6 +268,32 @@ validate with `[xml](Get-Content assets/x.svg -Raw)`, then DELETE the script.
 - `js/main.js` also live-follows OS theme changes IF the user hasn't chosen
   (feature-detects `addEventListener`/legacy `addListener`).
 
+## 7.1 Mobile menu (hamburger, ≤620px)
+
+- Hamburger button `#nav-toggle` (`.nav-toggle`): `display:none` by default
+  (brand-new selector, absent from desktop), revealed only inside the
+  `@media (max-width: 620px)` block. Three `<span>` bars that morph into an
+  X when open (driven by `[aria-expanded="true"]`). Sits at the right end of
+  the mobile top bar next to the theme toggle.
+- On mobile the `.header-inner` grid becomes a simple two-end flex row
+  (brand left; theme toggle + hamburger right), and the inline
+  `.header-contact` cluster + its divider are hidden (`display:none`) — those
+  links move INTO the menu. Hero / `.page-head` top padding is tightened a
+  touch. ALL of this lives under `(max-width: 620px)`; nothing changes ≥621px.
+- The `.mobile-menu` panel sits directly under the sticky header, matches the
+  header's frosted look (translucent bg + blur), and animates open via
+  `max-height` (0 → 70vh) toggled by an `.is-open` class. Collapsed by default.
+- `js/main.js` wires it: on load it `removeAttribute("hidden")` and manages the
+  panel by class instead. The toggle flips `.is-open` + `aria-expanded` and
+  swaps the button's `aria-label` (Open/Close menu). It **closes** on: tapping
+  any link in the panel, Escape (returns focus to the toggle), a click outside
+  the header/menu, and when a `(min-width: 621px)` media query starts matching
+  (so growing to desktop never leaves it half-open). Feature-detects
+  `addEventListener`/legacy `addListener` like the theme code.
+- Reduced-motion: a `(max-width:620px) and (prefers-reduced-motion: reduce)`
+  block drops the hamburger-morph and panel-slide transitions (the panel still
+  opens/closes, just without animation).
+
 ## 8. Other JS behavior (js/main.js)
 
 - Auto-tags `.section-head` with `.reveal`.
@@ -377,10 +418,13 @@ There is no build/test suite. Verify visually by opening index.html or
 Active history (most recent last): initial commit → themed animated UI →
 gradient fixes → color/cleanup → multi-page split + header/gradient/footer
 refine → soften mandala + real contact links → copy-email envelope → README
-rewrite → **lightbox: blur-only backdrop, themed circular close button,
-eyebrow-style caption** (this commit). When committing, stage files
-explicitly (not `git add .`), only commit when asked. The owner drives the
-remote; push to a new branch rather than main unless told otherwise.
+rewrite → lightbox: blur-only backdrop, themed circular close button,
+eyebrow-style caption → **mobile nav + header restructure for phones
+(≤620px): hamburger + slide-down menu; desktop unchanged** — committed on
+branch `mobile-nav-redesign` (pushed to origin; not yet merged to main).
+When committing, stage files explicitly (not `git add .`), only commit when
+asked. The owner drives the remote; push to a new branch rather than main
+unless told otherwise. Remote: https://github.com/Avarasd/portfolio.git.
 
 ## 13. Owner working style (important)
 

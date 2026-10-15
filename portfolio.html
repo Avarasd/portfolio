@@ -60,13 +60,16 @@
         <!-- Quick contact links, kept to the left of the name. -->
         <ul class="header-contact" aria-label="Contact">
           <li>
-            <a href="mailto:toth.avar@gmail.com" aria-label="Email" title="toth.avar@gmail.com">
+            <!-- The envelope icon copies the address on click (clearer than
+                 a separate copy icon). title/aria-label explain what it does. -->
+            <button type="button" class="copy-email" data-email="toth.avar@gmail.com" aria-label="Copy email address"
+              title="Copy email address">
               <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8"
                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <rect x="3" y="5" width="18" height="14" rx="2" />
                 <path d="M3.5 6.5l8.5 6 8.5-6" />
               </svg>
-            </a>
+            </button>
           </li>
           <li>
             <a href="https://github.com/Avarasd" target="_blank" rel="noopener" aria-label="GitHub" title="GitHub">
@@ -86,6 +89,9 @@
             </a>
           </li>
         </ul>
+        <!-- Palette-matched confirmation shown briefly after copying the
+             email. role=status so it's announced to screen readers. -->
+        <span class="copy-toast" id="copy-toast" role="status" aria-live="polite"></span>
         <a class="brand gradient-text" href="index.html">
           Tóth Avar
         </a>

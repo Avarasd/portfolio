@@ -255,8 +255,19 @@ validate with `[xml](Get-Content assets/x.svg -Raw)`, then DELETE the script.
 
 ## 8. Other JS behavior (js/main.js)
 
-- Footer year injection (`#year`).
 - Auto-tags `.section-head` with `.reveal`.
+- **Copy email**: the envelope icon in the header IS the copy button
+  (`.copy-email`, a `<button>`, NOT a mailto: link — there is no separate
+  copy icon; one envelope that copies on click, with `title`/`aria-label`
+  "Copy email address" so it's clear what it does). Clicking copies
+  `data-email` via `navigator.clipboard.writeText`, with a hidden-textarea
+  + `execCommand` FALLBACK for non-secure contexts (`file://` / non-HTTPS).
+  On success it briefly adds `.copied` (a quiet lift to `--ink`, not a
+  bright accent) and shows the `#copy-toast` for ~1.1s. The toast
+  (`.copy-toast`, `role="status"`) is a deliberately NEUTRAL little label
+  (faint `--bg-alt` fill, `--line` border, `--ink-soft` text — NOT the
+  accent; the accent version read as too neon) anchored under
+  `.header-left`, fade-only, with a reduced-motion fallback. One per page.
 - Scroll reveal via IntersectionObserver (`.reveal`, `.reveal-left/right/
   scale`) → adds `.is-visible`. Staggered.
 - **Floating bubbles**: injects a `.project-bubbles` layer with 7 `.bubble`

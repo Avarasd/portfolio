@@ -176,4 +176,71 @@
       );
     });
   });
+
+  // --- Copy email to clipboard (with a palette-matched confirmation) ---
+  // The email icon keeps its mailto: link; this is the separate little
+  // copy button next to it. Falls back to a hidden-textarea + execCommand
+  // when the async Clipboard API isn't available (e.g. file:// or non-
+  // HTTPS contexts) so it still works outside a secure context.
+  var copyButtons = document.querySelectorAll(".copy-email");
+  var toast = document.getElementById("copy-toast");
+  var toastTimer = null;
+
+  var copyText = function (text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      return navigator.clipboard.writeText(text);
+    }
+    // Legacy fallback.
+    return new Promise(function (resolve, reject) {
+      try {
+        var ta = document.createElement("textarea");
+        ta.value = text;
+        // Keep it out of view and prevent scroll jumps / zoom.
+        ta.setAttribute("readonly", "");
+        ta.style.position = "fixed";
+        ta.style.top = "-1000px";
+        ta.style.opacity = "0";
+        document.body.appendChild(ta);
+        ta.select();
+        var ok = document.execCommand("copy");
+        document.body.removeChild(ta);
+        ok ? resolve() : reject(new Error("execCommand failed"));
+      } catch (err) {
+        reject(err);
+      }
+    });
+  };
+
+  var showToast = function (message) {
+    if (!toast) return;
+    toast.textContent = message;
+    toast.classList.add("is-visible");
+    if (toastTimer) {
+      window.clearTimeout(toastTimer);
+    }
+    // Short-lived — just a quick confirmation, gone before it nags.
+    toastTimer = window.setTimeout(function () {
+      toast.classList.remove("is-visible");
+    }, 1100);
+  };
+
+  copyButtons.forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var email = btn.getAttribute("data-email") || "";
+      if (!email) return;
+      copyText(email).then(
+        function () {
+          btn.classList.add("copied");
+          window.setTimeout(function () {
+            btn.classList.remove("copied");
+          }, 900);
+          showToast("Copied");
+        },
+        function () {
+          // If copying genuinely fails, surface the address to copy manually.
+          showToast(email);
+        }
+      );
+    });
+  });
 })();

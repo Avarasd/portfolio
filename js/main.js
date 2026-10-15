@@ -73,12 +73,6 @@
     media.addListener(onSchemeChange);
   }
 
-  // --- Current year in footer ---
-  var yearEl = document.getElementById("year");
-  if (yearEl) {
-    yearEl.textContent = String(new Date().getFullYear());
-  }
-
   // --- Auto-tag section headings so they animate in too ---
   document.querySelectorAll(".section-head").forEach(function (el) {
     el.classList.add("reveal");

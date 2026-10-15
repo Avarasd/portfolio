@@ -546,11 +546,64 @@ em {
   border-bottom: 1px solid var(--line);
 }
 
+/* Three equal-weight zones: name + contact on the left, the 3 nav links
+   dead-center, the theme toggle on the right. A 1fr/auto/1fr grid keeps
+   the nav centered on the viewport regardless of how wide the side zones
+   are, and the equal 1fr sides give the left and right matching space. */
 .header-inner {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  height: 68px;
+}
+
+/* Left cluster: quick contact icon links sit to the LEFT of the brand
+   name, then the name. Aligned to the start of its (left) grid column. */
+.header-left {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  height: 68px;
+  justify-content: flex-start;
+  gap: clamp(0.75rem, 2vw, 1.4rem);
+}
+
+.header-contact {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+/* Small, muted icon links. They sit quietly next to the name and only
+   pick up the accent on hover/focus, so they add utility without
+   competing with the brand. */
+.header-contact a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  border-radius: 8px;
+  padding: 0.3rem;
+  transition: color 0.25s var(--ease), background-color 0.25s var(--ease),
+    transform 0.25s var(--ease);
+}
+
+.header-contact a:hover {
+  color: var(--accent);
+  background-color: color-mix(in srgb, var(--accent) 10%, transparent);
+  transform: translateY(-1px);
+}
+
+.header-contact a:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* A faint divider between the icons and the name. */
+.header-contact::after {
+  content: "";
+  align-self: stretch;
+  width: 1px;
+  margin-block: 0.4rem;
+  background: var(--line);
 }
 
 .brand {
@@ -622,92 +675,94 @@ em {
   transform: scaleX(1);
 }
 
+/* Current page: keep its underline permanently drawn and brighten the
+   link a touch so the active tab reads as selected across pages. */
+.nav a[aria-current="page"] {
+  filter: brightness(1.18) saturate(1.1);
+}
+
+.nav a[aria-current="page"]::after {
+  transform: scaleX(1);
+}
+
 @media (max-width: 620px) {
   .nav {
     display: none;
   }
 }
 
-/* ---------- Theme toggle (sliding switch) ---------- */
+/* ---------- Theme toggle (compact single-icon button) ----------
+   A small, quiet icon button that matches the weight of the social icons
+   on the left — it shows the sun in light mode and the moon in dark mode
+   (one at a time, crossfaded), so it never steals focus from the name
+   and nav the way a big bright pill did. */
 .theme-toggle {
-  --tt-w: 60px;
-  --tt-h: 30px;
-  --tt-pad: 3px;
-  --tt-thumb: calc(var(--tt-h) - var(--tt-pad) * 2);
-  margin-left: clamp(1rem, 2.5vw, 2rem);
+  /* Right zone of the header grid — pin to the right edge of its column. */
+  justify-self: end;
+  width: 34px;
+  height: 34px;
   padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border: none;
   background: none;
+  color: var(--muted);
   cursor: pointer;
-  line-height: 0;
-  border-radius: 999px;
+  border-radius: 8px;
+  transition: color 0.25s var(--ease), background-color 0.25s var(--ease);
+}
+
+.theme-toggle:hover {
+  color: var(--accent);
+  background-color: color-mix(in srgb, var(--accent) 10%, transparent);
 }
 
 .theme-toggle:focus-visible {
   outline: 2px solid var(--accent);
-  outline-offset: 3px;
+  outline-offset: 2px;
+}
+
+/* The two icons are stacked in the same spot; only the one for the
+   current theme is shown. */
+.theme-toggle-icon {
+  grid-area: 1 / 1;
+  display: inline-flex;
+  transition: opacity 0.3s var(--ease), transform 0.3s var(--ease);
 }
 
 .theme-toggle-track {
-  position: relative;
-  display: inline-block;
-  width: var(--tt-w);
-  height: var(--tt-h);
-  background: var(--bg-alt);
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  transition: background-color var(--theme-fade) var(--ease),
-    border-color var(--theme-fade) var(--ease);
+  display: grid;
+  place-items: center;
+  line-height: 0;
 }
 
-/* The sliding thumb */
-.theme-toggle-thumb {
-  position: absolute;
-  top: var(--tt-pad);
-  left: var(--tt-pad);
-  width: var(--tt-thumb);
-  height: var(--tt-thumb);
-  border-radius: 50%;
-  background: var(--ink);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-  transition: transform 0.4s var(--ease), background-color var(--theme-fade) var(--ease);
-}
-
-[data-theme="dark"] .theme-toggle-thumb {
-  transform: translateX(calc(var(--tt-w) - var(--tt-thumb) - var(--tt-pad) * 2));
-}
-
-/* Sun / moon icons sit at each end; the inactive one fades out */
-.theme-toggle-icon {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  display: inline-flex;
-  color: var(--ink-soft);
-  transition: opacity 0.4s var(--ease), color var(--theme-fade) var(--ease);
-}
-
+/* Light mode: show sun, hide moon. */
 .theme-toggle-sun {
-  left: 7px;
   opacity: 1;
+  transform: none;
 }
 
 .theme-toggle-moon {
-  right: 7px;
-  opacity: 0.35;
+  opacity: 0;
+  transform: scale(0.6) rotate(-30deg);
 }
 
+/* Dark mode: show moon, hide sun. */
 [data-theme="dark"] .theme-toggle-sun {
-  opacity: 0.35;
+  opacity: 0;
+  transform: scale(0.6) rotate(30deg);
 }
 
 [data-theme="dark"] .theme-toggle-moon {
   opacity: 1;
+  transform: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .theme-toggle-thumb {
-    transition: transform 0.001s;
+  .theme-toggle-icon {
+    transition: opacity 0.001s;
+    transform: none;
   }
 }
 
@@ -831,9 +886,11 @@ em {
 }
 
 /* ---------- Sections ---------- */
+/* No boxes or borders: sections are separated purely by generous
+   whitespace and their numbered headers (01, 02, ...). This keeps the
+   sacred-geometry background from clashing with card outlines. */
 .section {
-  padding-block: clamp(3.5rem, 9vh, 6.5rem);
-  border-top: 1px solid var(--line);
+  padding-block: clamp(3rem, 8vh, 5.5rem);
 }
 
 .section-head {
@@ -1131,6 +1188,42 @@ em {
   font-size: clamp(1.6rem, 1.2rem + 1.8vw, 2.6rem);
   font-weight: 400;
   margin-bottom: 0.5rem;
+  /* Project titles use the SAME restrained wash as the headers: the
+     normal ink easing into a single accent (not a two-color sweep, which
+     read as too "gradienty"). The only thing that varies is --proj-hue,
+     stepped FORWARD per card from the live base hue, so the titles still
+     read as an ordered progression down the list (project 1 -> 2 -> 3)
+     while each one looks like a tasteful ink->accent tint. All offsets
+     ADD to the hue (never subtract), so no negative-hue parse bug. */
+  --proj-hue: var(--accent-hue);
+  --proj-accent: hsl(var(--proj-hue) 70% 60%);
+  background-image: linear-gradient(100deg,
+      var(--grad-a) 15%,
+      var(--proj-accent) 92%);
+  background-size: 100% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  /* Serif ascenders / accents clear the clip box. */
+  padding-top: 0.06em;
+  width: fit-content;
+}
+
+/* Step each card's base hue forward so the sequence progresses. */
+.projects>li:nth-child(1) .project-title {
+  --proj-hue: var(--accent-hue);
+}
+
+.projects>li:nth-child(2) .project-title {
+  --proj-hue: calc(var(--accent-hue) + 30);
+}
+
+.projects>li:nth-child(3) .project-title {
+  --proj-hue: calc(var(--accent-hue) + 60);
+}
+
+.projects>li:nth-child(4) .project-title {
+  --proj-hue: calc(var(--accent-hue) + 90);
 }
 
 .project-meta {
@@ -1192,7 +1285,7 @@ em {
 /* ---------- Toolkit ---------- */
 .toolkit {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: clamp(1.5rem, 5vw, 3.5rem);
 }
 
@@ -1226,6 +1319,21 @@ em {
   .toolkit {
     grid-template-columns: 1fr;
   }
+}
+
+/* ---------- Interests ----------
+   Its own section beneath Education. A simple responsive multi-column
+   list of items, matching the muted editorial tone of the toolkit. */
+.interests {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: 0.55rem clamp(1.5rem, 5vw, 3.5rem);
+}
+
+.interests li {
+  color: var(--ink-soft);
+  padding-bottom: 0.55rem;
+  border-bottom: 1px solid var(--line);
 }
 
 /* ---------- Timeline ---------- */
@@ -1266,50 +1374,7 @@ em {
 }
 
 /* ---------- Contact ---------- */
-.contact-lead {
-  font-family: var(--serif);
-  font-size: clamp(1.6rem, 1.2rem + 2vw, 2.75rem);
-  line-height: 1.25;
-  max-width: 24ch;
-  margin-bottom: 2rem;
-}
-
-.contact-links {
-  display: flex;
-  flex-wrap: wrap;
-  gap: clamp(1rem, 4vw, 2.5rem);
-  font-size: 1.05rem;
-}
-
-.contact-links a {
-  border-bottom: 1px solid var(--line);
-  padding-bottom: 2px;
-  transition: border-color 0.25s var(--ease), color 0.25s var(--ease);
-}
-
-.contact-links a:hover {
-  border-color: var(--accent-2);
-  color: var(--accent-2);
-}
-
 /* ---------- Footer ---------- */
-.site-footer {
-  border-top: 1px solid var(--line);
-  padding-block: 2rem;
-  font-size: 0.85rem;
-  color: var(--muted);
-}
-
-.footer-inner {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.footer-inner a:hover {
-  color: var(--ink);
-}
-
 /* ---------- Scroll reveal ---------- */
 .reveal {
   opacity: 0;
@@ -1447,8 +1512,10 @@ em {
 
   /* Stop the gradient drift and restore a solid, fully-visible color on
      all gradient-clipped text. !important beats the themed animation
-     rules that have higher specificity. */
-  .gradient-text {
+     rules that have higher specificity. The project titles are
+     gradient-clipped too (though static), so restore them here as well. */
+  .gradient-text,
+  .project-title {
     animation: none !important;
     background: none;
     -webkit-background-clip: border-box;
@@ -1497,5 +1564,96 @@ em {
   .bubble {
     animation: none;
     display: none;
+  }
+}
+
+/* ============================================================
+   Multi-page additions
+   The site is split across Home (index.html), About (about.html)
+   and Portfolio (portfolio.html). These share this stylesheet, so
+   the design system, color ramp and background all stay identical.
+   ============================================================ */
+
+/* ---------- Page header (About / Portfolio) ----------
+   A lighter-weight hero for interior pages: the small gradient eyebrow
+   label plus one large italic serif title, echoing the home hero but
+   shorter so the content below leads. */
+.page-head {
+  padding-top: clamp(3rem, 10vh, 7rem);
+  padding-bottom: clamp(1.5rem, 5vh, 3rem);
+}
+
+.page-title {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: clamp(2.6rem, 2rem + 5vw, 6rem);
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+}
+
+/* Page titles ("Who I am", "Selected work") get the same clean two-tone
+   wash as the section headers: ink easing into the live accent (--grad-b),
+   i.e. the START of the palette ramp (pink/magenta in light, crimson-rose
+   in dark). Static (no drift) and exactly word-filling so large display
+   type stays refined and always clearly visible — same discipline as the
+   section titles and the "Avar" name. */
+.page-title.gradient-text {
+  background-image: linear-gradient(100deg,
+      var(--grad-a) 12%,
+      var(--grad-b) 90%);
+  background-size: 100% 100%;
+  animation: none;
+}
+
+/* ---------- Home: summary ----------
+   A short written summary on the landing page. (Contact links now live in
+   the top bar, to the left of the name, so there's no contact column
+   here anymore.) */
+/* The summary flows straight on from the hero, so it only needs a little
+   breathing room below (not full section padding) — it's no longer its
+   own numbered section. Kept modest so the short Home page doesn't leave a
+   big empty band above the footer. */
+.home-intro {
+  padding-bottom: clamp(1.5rem, 4vh, 2.5rem);
+}
+
+.home-grid {
+  display: grid;
+  gap: clamp(1.5rem, 5vw, 4rem);
+  align-items: start;
+}
+
+.home-summary {
+  font-family: var(--serif);
+  font-size: clamp(1.3rem, 1.05rem + 1.2vw, 1.9rem);
+  line-height: 1.35;
+  color: var(--ink);
+  max-width: 48ch;
+}
+
+/* In-flow links inside the summary pick up the live accent so they match
+   the rest of the color journey rather than looking pasted in. (This
+   block is no longer a .section, so it uses --accent directly rather
+   than a per-section --sec-accent.) */
+.home-summary a {
+  color: var(--accent);
+  border-bottom: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
+  transition: border-color 0.25s var(--ease), color 0.25s var(--ease);
+}
+
+.home-summary a:hover {
+  border-color: var(--accent);
+  filter: brightness(1.1);
+}
+
+/* ---------- Reduced-motion fallback for the page title ----------
+   .page-title itself isn't gradient-clipped (the eyebrow above it is,
+   and that's already handled by the shared .gradient-text fallback), so
+   just neutralise its reveal transform here for consistency. */
+@media (prefers-reduced-motion: reduce) {
+  .page-title {
+    opacity: 1;
+    transform: none;
+    filter: none;
   }
 }

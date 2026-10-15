@@ -221,12 +221,12 @@ body {
    hue-rotate inside it is ANIMATED so the mandala's colors slowly cycle
    and drift from one tone to another over time. */
 [data-theme="light"] .mandala {
-  filter: sepia(0.5) saturate(3.4) hue-rotate(300deg) brightness(1.03);
+  filter: blur(1.2px) sepia(0.5) saturate(3.4) hue-rotate(300deg) brightness(1.03);
   animation: mandalaHueLight 54s linear infinite;
 }
 
 [data-theme="dark"] .mandala {
-  filter: invert(1) sepia(0.5) saturate(2.4) hue-rotate(300deg) brightness(0.95);
+  filter: blur(1.2px) invert(1) sepia(0.5) saturate(2.4) hue-rotate(300deg) brightness(0.95);
   animation: mandalaHueDark 64s linear infinite;
 }
 
@@ -234,13 +234,13 @@ body {
    cycle — two animations run together (one drives transform, the other
    filter), so they don't conflict. */
 [data-theme="light"] .bg-accent {
-  filter: sepia(0.5) saturate(3.4) hue-rotate(300deg) brightness(1.03);
+  filter: blur(1.2px) sepia(0.5) saturate(3.4) hue-rotate(300deg) brightness(1.03);
   animation: bgDriftReverse 140s linear infinite,
     mandalaHueLight 54s linear infinite;
 }
 
 [data-theme="dark"] .bg-accent {
-  filter: invert(1) sepia(0.5) saturate(2.4) hue-rotate(300deg) brightness(0.95);
+  filter: blur(1.2px) invert(1) sepia(0.5) saturate(2.4) hue-rotate(300deg) brightness(0.95);
   animation: bgDriftReverse 140s linear infinite,
     mandalaHueDark 64s linear infinite;
 }
@@ -250,21 +250,21 @@ body {
    The base retint (sepia/saturate/brightness) is kept constant. */
 @keyframes mandalaHueLight {
   from {
-    filter: sepia(0.5) saturate(3.4) hue-rotate(260deg) brightness(1.03);
+    filter: blur(1.2px) sepia(0.5) saturate(3.4) hue-rotate(260deg) brightness(1.03);
   }
 
   to {
-    filter: sepia(0.5) saturate(3.4) hue-rotate(620deg) brightness(1.03);
+    filter: blur(1.2px) sepia(0.5) saturate(3.4) hue-rotate(620deg) brightness(1.03);
   }
 }
 
 @keyframes mandalaHueDark {
   from {
-    filter: invert(1) sepia(0.5) saturate(2.4) hue-rotate(260deg) brightness(0.95);
+    filter: blur(1.2px) invert(1) sepia(0.5) saturate(2.4) hue-rotate(260deg) brightness(0.95);
   }
 
   to {
-    filter: invert(1) sepia(0.5) saturate(2.4) hue-rotate(620deg) brightness(0.95);
+    filter: blur(1.2px) invert(1) sepia(0.5) saturate(2.4) hue-rotate(620deg) brightness(0.95);
   }
 }
 

@@ -51,6 +51,8 @@
   /* Type */
   --serif: "Newsreader", Georgia, "Times New Roman", serif;
   --sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "SFMono-Regular", "SF Mono", "JetBrains Mono", "Menlo",
+    "Consolas", "Liberation Mono", monospace;
 
   /* Layout */
   --maxw: 1100px;
@@ -1237,7 +1239,8 @@ em {
 .project-title {
   font-size: clamp(1.6rem, 1.2rem + 1.8vw, 2.6rem);
   font-weight: 400;
-  margin-bottom: 0.5rem;
+  /* Spacing below the title is carried by .project-head now. */
+  margin-bottom: 0;
   /* Project titles use the SAME restrained wash as the headers: the
      normal ink easing into a single accent (not a two-color sweep, which
      read as too "gradienty"). The only thing that varies is --proj-hue,
@@ -1274,6 +1277,99 @@ em {
 
 .projects>li:nth-child(4) .project-title {
   --proj-hue: calc(var(--accent-hue) + 90);
+}
+
+/* ---- Project head: title + year ----
+   The YEAR sits beside the title (not in the pill row) as a quiet, tracked-
+   out monospace label — an editorial dateline rather than a stat pill. It
+   baseline-aligns to the big serif title and stays muted so the title leads. */
+.project-head {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-bottom: 0.5rem;
+}
+
+.project-year {
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.14em;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+/* ---- Project badges (editorial / ghost) ----
+   A row of small GHOST pills under the title: transparent fill, a 1px
+   hairline frame, and 11px uppercase monospace text tracked wide — echoing
+   the page's thin dividers and numbered-section idiom rather than loud
+   stat chips. Every badge on a card shares that card's SINGLE accent hue
+   (--proj-hue, the same forward ramp that tints the title) at low opacity,
+   so each project reads as one cohesive, intentional colour identity
+   (card 1 plum, card 2 warmer, card 3 further along) instead of four
+   scattered colours. Slot 1 is the language. All hue offsets ADD (never
+   subtract) → no negative-hue parse bug (see project context §5).
+   READABILITY: the label uses the theme's high-contrast --ink; the hue only
+   tints the hairline border and a whisper of fill, so words stay legible. */
+.project-badges {
+  --proj-hue: var(--accent-hue);
+  --badge-accent: hsl(var(--proj-hue) 60% 55%);
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0 0 1rem;
+  padding: 0;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  /* Hairline frame tinted to the card's accent, plus a whisper of fill so
+     the ambient mandala still shows through. */
+  border: 1px solid color-mix(in srgb, var(--badge-accent) 42%, transparent);
+  background: color-mix(in srgb, var(--badge-accent) 7%, transparent);
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  /* 11px */
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  line-height: 1;
+  color: var(--ink);
+  white-space: nowrap;
+  transition: border-color 0.3s var(--ease), background 0.3s var(--ease);
+}
+
+.badge span {
+  display: inline-block;
+}
+
+/* Match each card's badge hue to that card's title tint (same forward ramp
+   as .project-title), so a card's badges and its title are one family. */
+.projects>li:nth-child(1) .project-badges {
+  --proj-hue: var(--accent-hue);
+}
+
+.projects>li:nth-child(2) .project-badges {
+  --proj-hue: calc(var(--accent-hue) + 30);
+}
+
+.projects>li:nth-child(3) .project-badges {
+  --proj-hue: calc(var(--accent-hue) + 60);
+}
+
+.projects>li:nth-child(4) .project-badges {
+  --proj-hue: calc(var(--accent-hue) + 90);
+}
+
+/* Firm the frame slightly when the card is active, matching the card's own
+   quiet hover lift. */
+.project:hover .badge {
+  border-color: color-mix(in srgb, var(--badge-accent) 62%, transparent);
+  background: color-mix(in srgb, var(--badge-accent) 11%, transparent);
 }
 
 .project-desc {

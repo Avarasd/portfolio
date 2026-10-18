@@ -193,22 +193,27 @@
           <div class="project-content">
             <div class="project-head">
               <h3 class="project-title italic">Chess TUI</h3>
-              <span class="project-year" aria-label="Year">— 2024</span>
+              <span class="project-year" aria-label="Year">— 2024–2025</span>
             </div>
             <ul class="project-badges" aria-label="Project stack">
-              <li class="badge"><span>C</span></li>
+              <li class="badge"><span>C / C++</span></li>
+              <li class="badge"><span>OOP</span></li>
               <li class="badge"><span>Terminal UI</span></li>
-              <li class="badge"><span>Algorithms</span></li>
             </ul>
             <p class="project-desc">
-              A full chess program for the terminal, written in C. It enforces
-              every rule — castling, en passant, promotion, check and
-              checkmate — and includes an analysis mode that replays a saved
-              game move by move with branching variations.
+              A full chess program for the terminal. It enforces every rule —
+              castling, en passant, promotion, check and checkmate — and
+              includes an analysis mode that replays a saved game move by move
+              with branching variations. It began as a C project, then was
+              refactored into modern C++ around a polymorphic piece hierarchy
+              with virtual dispatch and an MVC-inspired split between engine,
+              display and storage, backed by a gtest suite.
             </p>
             <div class="project-links">
               <a href="https://github.com/Avarasd/chess-tui" target="_blank" rel="noopener"
-                aria-label="Chess TUI repository">Repository ↗</a>
+                aria-label="Chess TUI (C) repository">C version ↗</a>
+              <a href="https://github.com/Avarasd/chess-tui_cpp" target="_blank" rel="noopener"
+                aria-label="Chess TUI (C++) repository">C++ version ↗</a>
             </div>
           </div>
           <div class="project-media">
